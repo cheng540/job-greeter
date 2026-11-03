@@ -1,0 +1,30 @@
+# 构建产物
+app/build/
+build/
+*.apk
+!打招呼助手.apk
+
+# 签名（自己生成，不要提交）
+debug.keystore
+
+# IDE
+.idea/
+*.iml
+.gradle/
+local.properties
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 测试产物
+.edge*/
+preview-*.png
+talk.apk
+talk.html.bak*
+resume_extract.txt
+preview-*.png
+talk.apk
+talk.html.bak*
+resume_extract.txt
+preview-*.png

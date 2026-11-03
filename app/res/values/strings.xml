@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">打招呼助手</string>
+    <string name="acc_desc">读取当前屏幕上的文字，生成打招呼话术。仅在点击悬浮球时读取一次，不保存任何内容。</string>
+</resources>

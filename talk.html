@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e40af">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="talk-manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>BOSS 打招呼助手</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: #f2f4f8; color: #1f2937; line-height: 1.6;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
+    font-size: 15px;
+  }
+  header {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+    color: #fff; padding: calc(14px + env(safe-area-inset-top)) 18px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 20;
+  }
+  header h1 { font-size: 16px; font-weight: 600; letter-spacing: .5px; }
+  header .sub { font-size: 11.5px; opacity: .8; margin-top: 1px; }
+  .gear {
+    background: rgba(255,255,255,.18); border: none; color: #fff;
+    width: 36px; height: 36px; border-radius: 10px; font-size: 17px; cursor: pointer;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 14px 14px 0; }
+  .card {
+    background: #fff; border-radius: 16px; padding: 16px;
+    box-shadow: 0 1px 4px rgba(16,24,40,.06); margin-bottom: 14px;
+  }
+  .step { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .step .n {
+    flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+    background: #2563eb; color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step .t { font-size: 14px; font-weight: 600; }
+  textarea {
+    width: 100%; min-height: 128px; max-height: 46vh; resize: vertical;
+    border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px;
+    font-size: 16px; line-height: 1.65; font-family: inherit; color: #1f2937;
+    background: #fbfcfe; outline: none;
+  }
+  textarea:focus { border-color: #2563eb; background: #fff; }
+  .hint { font-size: 11.5px; color: #94a3b8; margin-top: 7px; line-height: 1.55; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip {
+    font-size: 12px; padding: 4px 10px; border-radius: 999px;
+    background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+  }
+  .chip.mute { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .row.wrap { flex-wrap: wrap; }
+  select, .btn {
+    font-family: inherit; font-size: 14px;
+  }
+  select {
+    flex: 1; min-width: 0; padding: 11px 10px; border-radius: 11px;
+    border: 1.5px solid #e2e8f0; background: #fff; color: #1f2937; outline: none;
+    appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%2394a3b8' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .btn {
+    border: none; border-radius: 12px; padding: 13px 16px; cursor: pointer;
+    font-weight: 600; transition: opacity .15s;
+  }
+  .btn:active { opacity: .75; }
+  .btn.primary { background: #2563eb; color: #fff; width: 100%; font-size: 15.5px; margin-top: 12px; }
+  .btn.primary:disabled { background: #cbd5e1; cursor: default; }
+  .btn.ghost { background: #f1f5f9; color: #334155; flex: 1; }
+  .btn.mini { padding: 9px 12px; font-size: 13px; border-radius: 10px; }
+  #out {
+    font-size: 15px; line-height: 1.85; white-space: pre-wrap; word-break: break-word;
+    line-break: strict;
+    color: #111827; background: #fbfcfe; border-radius: 12px; padding: 14px;
+    border: 1px solid #eef2f7; max-height: 52vh; overflow: auto;
+  }
+  #resultCard { scroll-margin-top: 78px; }
+  .meta { font-size: 11.5px; color: #94a3b8; margin-top: 8px; text-align: right; }
+  .toast {
+    position: fixed; left: 50%; top: calc(72px + env(safe-area-inset-top));
+    transform: translateX(-50%) translateY(-10px);
+    background: #111827; color: #fff; font-size: 13.5px; padding: 10px 18px;
+    border-radius: 999px; opacity: 0; pointer-events: none; transition: all .22s; z-index: 60;
+    max-width: 88vw; text-align: center;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .sheet-mask {
+    position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 40;
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .sheet-mask.on { display: flex; }
+  .sheet {
+    background: #fff; width: 100%; max-width: 560px; border-radius: 20px 20px 0 0;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom));
+    max-height: 88vh; overflow: auto;
+  }
+  .sheet h2 { font-size: 15.5px; margin-bottom: 4px; }
+  .sheet .desc { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12.5px; color: #475569; margin-bottom: 5px; font-weight: 500; }
+  .field input {
+    width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 15px; font-family: inherit; outline: none; background: #fbfcfe;
+  }
+  .field input:focus { border-color: #2563eb; background: #fff; }
+  .field .tip { font-size: 11px; color: #a0aec0; margin-top: 4px; }
+  .switch-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 0; border-top: 1px solid #f1f5f9; font-size: 14px;
+  }
+  .switch { position: relative; width: 44px; height: 25px; flex: 0 0 auto; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch span {
+    position: absolute; inset: 0; background: #cbd5e1; border-radius: 999px; transition: .2s;
+  }
+  .switch span::after {
+    content: ""; position: absolute; width: 19px; height: 19px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px; transition: .2s;
+  }
+  .switch input:checked + span { background: #2563eb; }
+  .switch input:checked + span::after { transform: translateX(19px); }
+  .divider { height: 1px; background: #f1f5f9; margin: 14px 0; }
+  .sec-label { font-size: 12px; font-weight: 600; color: #2563eb; letter-spacing: 1px; margin-bottom: 10px; }
+  @media (max-width: 360px) { .btn.ghost { font-size: 13px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>BOSS 打招呼助手</h1>
+    <div class="sub">粘贴岗位详情 → 一键生成开场白</div>
+  </div>
+  <button class="gear" id="openSet" aria-label="设置">⚙</button>
+</header>
+
+<main>
+  <div class="card">
+    <div class="step"><span class="n">1</span><span class="t">把岗位详情粘进来</span></div>
+    <textarea id="jd" placeholder="BOSS 不让长按复制的话，这样拿文字：&#10;截图 → 发到微信文件传输助手 → 长按图片选「提取文字」→ 全选复制 → 粘到这里。&#10;&#10;在电脑上打开 BOSS 网页版则可以直接选中复制。"></textarea>
+    <div class="hint">粘贴不完全整齐也没关系，标题、公司、职位描述一起粘进来，识别更准。</div>
+    <div class="chips" id="chips"><span class="chip mute">等待粘贴…</span></div>
+    <div class="row" style="margin-top:12px;">
+      <select id="type" aria-label="岗位类型">
+        <option value="auto">自动识别岗位类型</option>
+        <option value="java">Java 开发</option>
+        <option value="front">前端开发</option>
+        <option value="back">后端开发</option>
+        <option value="test">软件测试</option>
+        <option value="ai">AI 应用开发</option>
+        <option value="agent">Agent 开发 / 应用</option>
+      </select>
+    </div>
+    <button class="btn primary" id="gen">生成打招呼</button>
+  </div>
+
+  <div class="card" id="resultCard" hidden>
+    <div class="step"><span class="n">2</span><span class="t">复制去发送</span></div>
+    <div id="out"></div>
+    <div class="meta" id="meta"></div>
+    <div class="row wrap" style="margin-top:12px;">
+      <button class="btn ghost" id="copy">复制这段话</button>
+      <button class="btn ghost" id="again">换一版</button>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="sheet-mask" id="mask">
+  <div class="sheet">
+    <h2>设置</h2>
+    <div class="desc">这些只存在你手机本地，不会上传。</div>
+
+    <div class="sec-label">我是谁</div>
+    <div class="field">
+      <label>学校 + 专业</label>
+      <input id="setSchool" placeholder="例如：某某大学 计算机科学与技术">
+    </div>
+    <div class="row" style="gap:10px;">
+      <div class="field" style="flex:1;">
+        <label>毕业届别</label>
+        <input id="setYear" placeholder="2027 届">
+      </div>
+      <div class="field" style="flex:1;">
+        <label>到岗状态</label>
+        <input id="setAvail" placeholder="可随时到岗实习">
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sec-label">AI 润色（可选）</div>
+    <div class="switch-row" style="border-top:none; padding-top:0;">
+      <span>让模型按 JD 再改一版</span>
+      <label class="switch"><input type="checkbox" id="setAi"><span></span></label>
+    </div>
+    <div class="hint" style="margin-bottom:10px;">不填也能用，规则生成的版本已经够了。当前是本机 http 页面，浏览器会拦截对 https 接口的请求，这块要等接了服务器代理才能真正跑通。</div>
+    <div class="field">
+      <label>接口地址</label>
+      <input id="setUrl" placeholder="https://api.example.com/v1/chat/completions">
+      <div class="tip">填完整的 chat/completions 地址</div>
+    </div>
+    <div class="field">
+      <label>模型名</label>
+      <input id="setModel" placeholder="deepseek-v4.1-flash">
+    </div>
+    <div class="field">
+      <label>API Key</label>
+      <input id="setKey" type="password" placeholder="sk-..." autocomplete="off">
+      <div class="tip">只保存在本机浏览器，不经过任何第三方</div>
+    </div>
+    <button class="btn ghost mini" id="testApi" style="width:100%;">测试连接</button>
+
+    <div class="divider"></div>
+    <button class="btn primary" id="saveSet" style="margin-top:0;">保存</button>
+    <button class="btn ghost mini" id="closeSet" style="width:100%; margin-top:10px;">关闭</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var LS = "boss_talk_cfg_v1";
+  var cfg = {
+    school: "",
+    year: "2027 届",
+    avail: "可随时到岗实习",
+    ai: false,
+    url: "",
+    model: "deepseek-v4.1-flash",
+    key: ""
+  };
+
+  try {
+    var saved = JSON.parse(localStorage.getItem(LS) || "null");
+    if (saved) { for (var k in saved) { if (saved[k] !== undefined) cfg[k] = saved[k]; } }
+  } catch (e) {}
+
+  function saveCfg() { try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) {} }
+
+  var TYPES = {
+    java:  { name: "Java 开发", kw: ["java", "spring", "springboot", "spring boot", "mybatis", "jvm", "mvc", "微服务", "dubbo", "hibernate", "ssm", "jpa"] },
+    front: { name: "前端开发", kw: ["前端", "vue", "react", "html", "css", "javascript", "typescript", "uniapp", "小程序", "h5", "webpack", "vite", "element", "antd", "jquery"] },
+    back:  { name: "后端开发", kw: ["后端", "服务端", "node", "express", "golang", "go语言", "python", "redis", "mysql", "数据库", "并发", "接口设计", "websocket", "nginx", "linux"] },
+    test:  { name: "软件测试", kw: ["测试", "用例", "junit", "自动化测试", "selenium", "postman", "缺陷", "回归", "pytest", "appium", "质量", "黑盒", "白盒"] },
+    ai:    { name: "AI 应用开发", kw: ["大模型", "llm", "rag", "prompt", "提示词", "向量", "微调", "langchain", "知识库", "多模态", "ocr", "embedding", "检索增强"] },
+    agent: { name: "Agent 开发", kw: ["agent", "智能体", "function calling", "工具调用", "工作流", "mcp", "tool", "规划", "记忆", "自主"] }
+  };
+
+  var EVIDENCE = {
+    java: [
+      { t: "社区物业报修工单系统是完整闭环（住户报修 → 管理员派单 → 维修工处理 → 住户评价，含状态流转、紧急度分级、多维筛选、ER 图与业务流程设计）", k: ["spring", "mybatis", "jwt", "工单", "管理系统", "erp", "oa", "权限"] },
+      { t: "校园外卖点餐做了订单状态机、BCrypt 加盐和价格快照防篡改", k: ["订单", "支付", "商城", "电商", "外卖", "交易"] },
+      { t: "同类管理系统累计交付 8 套以上，每套都附源码 + 部署文档 + 使用教程，客户能自己跑起来", k: ["交付", "文档", "维护", "交付能力", "实施"] },
+      { t: "前端 Vue3 + Element Plus 也能自己写，不用等前端排期", k: ["vue", "element", "全栈", "前后端"] }
+    ],
+    front: [
+      { t: "三端项目（用户端 + 管理端独立工程 + Express 后端），两端独立构建、职责分离", k: ["vue", "管理后台", "多端", "组件", "工程化"] },
+      { t: "手机优先的网页游戏厅，宫格导航、WebSocket 联机房间、35 款小游戏聚合页（搜索 / 分类 / 热度排序），线上有真实用户在用", k: ["移动端", "h5", "响应式", "适配", "小程序", "h5开发"] },
+      { t: "ECharts 做过趋势图与行情看板，数据可视化的坑基本踩过一遍", k: ["echarts", "可视化", "图表", "数据大屏", "canvas"] },
+      { t: "接口对接、切图还原、移动端适配都能独立完成，不用前后端互相等", k: ["接口", "联调", "还原", "适配"] }
+    ],
+    back: [
+      { t: "Node.js 做过 HTTP 与 WebSocket 同端口单进程的实时联机服务，房间码邀请、好友房、AI 补位", k: ["node", "websocket", "实时", "长连接", "socket"] },
+      { t: "棋牌类游戏用服务端权威判定引擎，客户端改数据不生效", k: ["安全", "校验", "并发", "一致性", "防作弊"] },
+      { t: "Spring Boot + MyBatis-Plus + JWT 那套也写过，配 Vue3 管理后台", k: ["java", "spring", "mysql", "后台"] },
+      { t: "服务器自己运维，Linux、nginx、systemd、Docker 部署都熟，出问题能自己查日志", k: ["linux", "部署", "运维", "docker", "nginx", "服务器"] }
+    ],
+    test: [
+      { t: "JUnit 写过 8 个测试方法、14 条断言，专门分正常 / 边界 / null 三类输入去覆盖", k: ["junit", "单元测试", "白盒", "java", "断言"] },
+      { t: "Postman 做过断言脚本 + 数据驱动批量运行，附完整测试记录表", k: ["postman", "接口测试", "api", "自动化"] },
+      { t: "网页项目用 Playwright 写了 8 组回归用例，全部通过", k: ["playwright", "自动化测试", "ui测试", "selenium", "回归"] },
+      { t: "自己项目里排查修复过 10 处缺陷，包括密钥硬编码、eval 注入、指数爆炸风险这类隐患", k: ["缺陷", "bug", "排查", "定位", "安全"] }
+    ],
+    ai: [
+      { t: "基于 DeepSeek Function Calling 的对话助手，封装了 20 个工具函数（联网搜索、视频解析、OCR、图片理解、语音合成、文档入库检索），由模型自主调度", k: ["function calling", "工具", "多模态", "ocr", "语音", "插件"] },
+      { t: "RAG 做过两套方案：轻量版用中文 bigram + BM25 不依赖向量库，完整版用 Qdrant 向量库 + PDF 累积入库 + 片段溯源", k: ["rag", "向量", "知识库", "检索", "embedding", "文档"] },
+      { t: "服务部署在腾讯云，supervisord 托管，7×24 跑着，不是本地跑个 demo", k: ["部署", "上线", "工程化", "落地"] },
+      { t: "中医药知识库问答、微博热搜情绪管道（Kafka + Spark 流式）这类案例也做过", k: ["知识库", "数据", "流式", "实时", "行业"] }
+    ],
+    agent: [
+      { t: "一个跑了 30 多天的无人值守 Agent：每天 17:30 自动跑完行情拉取 → 持仓同步 → 技术分析 → 独立决策 → Word 日报 → 企业微信推送，累计产出 90+ 份日报，中间没人干预", k: ["自动化", "无人值守", "定时", "任务", "流程", "落地"], pin: 1 },
+      { t: "三层防幻觉：模型只能通过 6 个工具取数、金额和百分比自动跟工具返回值交叉校验、每条结论附取数依据让人能自己核对", k: ["幻觉", "准确", "可靠", "校验", "评估", "function calling"] },
+      { t: "分级告警：紧急信号即时推送，温和波动汇入每日两次汇总，关键信号要连续两次巡检确认才推，专门解决「什么时候该打扰人」", k: ["告警", "推送", "通知", "策略", "工作流"] },
+      { t: "规则引擎管事实和风控，大模型管解读和判断，这个分工踩过坑、调整过几轮", k: ["架构", "设计", "工程", "混合", "规则"] }
+    ]
+  };
+
+  var OPENERS = [
+  var OPENERS = [
+    "您好，我是{who}，{avail}。",
+    "您好，我是{who}，{avail}。"
+  ];
+
+  function whoami() {
+    var parts = [];
+    if (cfg.school) parts.push(cfg.school);
+    if (cfg.year) parts.push(cfg.year);
+    return parts.length > 0 ? parts.join(" ") + "的应届生" : "应届生";
+  }
+    "您好，{school} {year}，{avail}。",
+  ];
+
+  var CLOSERS = [
+    "方便的话，我先发一份简历和项目源码给您过目？",
+    "发您一份作品集看看？",
+    "可以的话我把简历和项目细节发您？",
+    "有兴趣的话我发您简历和项目源码？"
+  ];
+
+  function $(id) { return document.getElementById(id); }
+
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("on");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.classList.remove("on"); }, 2200);
+  }
+
+  /* ---------- 解析 ---------- */
+  function parse(text) {
+    var low = text.toLowerCase();
+    var scores = {}, best = "java", bestScore = 0;
+
+    for (var key in TYPES) {
+      var s = 0, kws = TYPES[key].kw;
+      for (var i = 0; i < kws.length; i++) {
+        if (low.indexOf(kws[i]) >= 0) { s += kws[i].length > 4 ? 2 : 1; }
+      }
+      scores[key] = s;
+    }
+    /* Agent 与 AI 高度重叠，出现强信号时优先给 Agent */
+    if (/智能体|function\s*calling|工具调用|mcp|agent/i.test(text)) { scores.agent += 3; }
+    /* 测试岗若同时命中大量开发词，说明是开发岗附带写用例，压低测试分 */
+    if (scores.test > 0 && scores.test < scores.java) { scores.test = Math.max(0, scores.test - 2); }
+
+    for (var k2 in scores) { if (scores[k2] > bestScore) { bestScore = scores[k2]; best = k2; } }
+
+    var company = "";
+    var cm = text.match(/([\u4e00-\u9fa5A-Za-z0-9（）()·]{2,20}(?:股份有限公司|有限责任公司|有限公司))/)
+          || text.match(/([\u4e00-\u9fa5A-Za-z0-9（）()·]{2,16}(?:科技|网络|信息技术|软件|集团|研究院|工作室|数码|数据))/);
+    if (cm) { company = cm[1]; }
+
+    var title = "";
+    var lines = text.split(/\n+/);
+    for (var j = 0; j < lines.length && j < 40; j++) {
+      var ln = lines[j].trim();
+      if (ln.length >= 3 && ln.length <= 24 && /(工程师|开发|测试|实习|前端|后端|算法|Java|Agent|产品|专员|助理)/i.test(ln) && !/^\d/.test(ln)) {
+        title = ln; break;
+      }
+    }
+
+    var salary = "";
+    var sm = text.match(/(\d{1,3}(?:\.\d)?)\s*[-~—至]\s*(\d{1,3}(?:\.\d)?)\s*[kK千]/);
+    if (sm) { salary = sm[1] + "-" + sm[2] + "K"; }
+
+    return { type: best, score: bestScore, scores: scores, company: company, title: title, salary: salary, raw: text };
+  }
+
+  function pickEvidence(type, text, n, seed) {
+    var pool = EVIDENCE[type] || EVIDENCE.java;
+    var low = text.toLowerCase();
+    var scored = pool.map(function (it, idx) {
+      var hit = 0;
+      for (var i = 0; i < it.k.length; i++) { if (low.indexOf(it.k[i]) >= 0) { hit += 1; } }
+      return { it: it, hit: hit, idx: idx };
+    });
+    scored.sort(function (a, b) {
+      if (b.hit !== a.hit) { return b.hit - a.hit; }
+      return ((a.idx + seed) % pool.length) - ((b.idx + seed) % pool.length);
+    });
+    var out = [];
+    /* 先放必须出现的（pin），再按相关度补足 */
+    scored.forEach(function (x) { if (x.it.pin && out.length < n) { out.push(x); } });
+    scored.forEach(function (x) {
+      if (out.length < n && out.indexOf(x) < 0) { out.push(x); }
+    });
+    return out.map(function (x) { return x.it.t; });
+  }
+
+  function build(parsed, type, seed) {
+    var t = TYPES[type] ? TYPES[type].name : "开发";
+    var opener = OPENERS[seed % OPENERS.length]
+      .replace("{who}", whoami()).replace("{avail}", cfg.avail);
+
+    var head = "";
+    if (parsed.title && parsed.company) {
+      head = "看到贵司在招「" + parsed.title + "」，岗位方向和我做的事对得上。";
+    } else if (parsed.title) {
+      head = "看到这个「" + parsed.title + "」岗位，方向和我做的事对得上。";
+    } else if (parsed.company) {
+      head = "看到贵司的" + t + "岗位，方向和我做的事对得上。";
+    } else {
+      head = "看到这个" + t + "岗位，方向和我做的事对得上。";
+    }
+
+    var ev = pickEvidence(type, parsed.raw, 2, seed);
+
+    var closer = CLOSERS[seed % CLOSERS.length];
+
+    return opener + "\n\n" + head + "\n\n" + ev.join("。") + "。\n\n" + closer;
+  }
+
+  /* ---------- 界面 ---------- */
+  var parsed = null;
+  var lastType = "java";
+  var seed = 0;
+  var lastText = "";
+
+  function renderChips(p) {
+    var box = $("chips");
+    box.innerHTML = "";
+    function add(txt, mute) {
+      var s = document.createElement("span");
+      s.className = "chip" + (mute ? " mute" : "");
+      s.textContent = txt;
+      box.appendChild(s);
+    }
+    if (!p || !p.raw.trim()) { add("等待粘贴…", true); return; }
+    add("命中 " + (TYPES[p.type] ? TYPES[p.type].name : "未知") + " 特征");
+    if (p.company) { add(p.company); }
+    if (p.title) { add(p.title); }
+    if (p.salary) { add(p.salary); }
+    if (!p.company && !p.title && !p.salary) { add("没认出公司/岗位，但不影响生成", true); }
+  }
+
+  function doParse() {
+    var txt = $("jd").value || "";
+    parsed = parse(txt);
+    lastType = parsed.type;
+    renderChips(parsed);
+    $("type").value = "auto";
+  }
+
+  $("jd").addEventListener("input", doParse);
+  $("jd").addEventListener("paste", function () { setTimeout(doParse, 30); });
+
+  $("type").addEventListener("change", function () {
+    if (this.value !== "auto") { lastType = this.value; }
+  });
+
+  function generate(forceType) {
+    var txt = ($("jd").value || "").trim();
+    if (!txt) { toast("先把岗位详情粘贴进来"); $("jd").focus(); return; }
+    if (!parsed) { doParse(); }
+    var type = forceType || ($("type").value !== "auto" ? $("type").value : lastType);
+    lastType = type;
+
+    var text = build(parsed, type, seed);
+    lastText = text;
+    $("out").textContent = text;
+    $("meta").textContent = text.length + " 字 · " + (TYPES[type] ? TYPES[type].name : "") + (parsed.company ? " · " + parsed.company : "");
+    $("resultCard").hidden = false;
+    $("resultCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    copyText(text, true);
+
+    if (cfg.ai && cfg.url && cfg.key) { refine(text, txt, type); }
+  }
+
+  function copyText(text, silent) {
+    function done() {
+      var m = $("meta");
+      if (m && m.textContent.indexOf("已复制") < 0) { m.textContent += " · 已复制"; }
+      var b = $("copy");
+      if (b) {
+        b.textContent = "已复制 ✓";
+        clearTimeout(copyText._t);
+        copyText._t = setTimeout(function () { b.textContent = "复制这段话"; }, 1600);
+      }
+      if (!silent) { toast("已复制"); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { fallback(text, done); });
+    } else { fallback(text, done); }
+  }
+  function fallback(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { toast("复制失败，请长按选中手动复制"); }
+    document.body.removeChild(ta);
+  }
+
+  $("gen").addEventListener("click", function () { generate(); });
+  $("again").addEventListener("click", function () { seed++; generate(lastType); });
+  $("copy").addEventListener("click", function () { copyText(lastText, false); });
+
+  /* ---------- AI 润色 ---------- */
+  function refine(base, jdText, type) {
+    var sys = "你是求职开场白改写助手。用户给你一段岗位 JD 和一段已经写好的开场白，请结合 JD 里的具体技术关键词做轻量改写：保留事实，不要新增用户没有的经历，不要编造公司信息，控制在 200 字以内，语气平和务实，不要客套堆砌。只输出改写后的正文。";
+    var userMsg = "岗位类型：" + (TYPES[type] ? TYPES[type].name : "") + "\n\nJD：\n" + jdText.slice(0, 2500) + "\n\n原稿：\n" + base;
+
+    fetch(cfg.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + cfg.key },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [{ role: "system", content: sys }, { role: "user", content: userMsg }],
+        temperature: 0.6
+      })
+    }).then(function (r) {
+      if (!r.ok) { throw new Error("HTTP " + r.status); }
+      return r.json();
+    }).then(function (data) {
+      var txt = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (!txt) { throw new Error("返回格式不对"); }
+      lastText = txt.trim();
+      $("out").textContent = lastText;
+      $("meta").textContent = lastText.length + " 字 · AI 润色版";
+      copyText(lastText, true);
+    }).catch(function (e) {
+      toast("AI 润色失败：" + e.message + "（已保留原稿）");
+    });
+  }
+
+  /* ---------- 设置 ---------- */
+  function fillSet() {
+    $("setSchool").value = cfg.school;
+    $("setYear").value = cfg.year;
+    $("setAvail").value = cfg.avail;
+    $("setAi").checked = !!cfg.ai;
+    $("setUrl").value = cfg.url;
+    $("setModel").value = cfg.model;
+    $("setKey").value = cfg.key;
+  }
+
+  $("openSet").addEventListener("click", function () { fillSet(); $("mask").classList.add("on"); });
+  $("closeSet").addEventListener("click", function () { $("mask").classList.remove("on"); });
+  $("mask").addEventListener("click", function (e) { if (e.target === this) { this.classList.remove("on"); } });
+
+  $("saveSet").addEventListener("click", function () {
+    cfg.school = $("setSchool").value.trim();
+    cfg.year = $("setYear").value.trim() || "2027 届";
+    cfg.avail = $("setAvail").value.trim() || "可随时到岗实习";
+    cfg.ai = $("setAi").checked;
+    cfg.url = $("setUrl").value.trim();
+    cfg.model = $("setModel").value.trim();
+    cfg.key = $("setKey").value.trim();
+    saveCfg();
+    $("mask").classList.remove("on");
+    toast("已保存");
+  });
+
+  $("testApi").addEventListener("click", function () {
+    var url = $("setUrl").value.trim(), key = $("setKey").value.trim(), model = $("setModel").value.trim();
+    if (!url || !key) { toast("地址和 Key 都要填"); return; }
+    toast("测试中…");
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+      body: JSON.stringify({ model: model, messages: [{ role: "user", content: "回复两个字：可用" }], max_tokens: 20 })
+    }).then(function (r) {
+      return r.text().then(function (body) {
+        if (!r.ok) { throw new Error("HTTP " + r.status + " " + body.slice(0, 160)); }
+        toast("连接正常，模型可用");
+      });
+    }).catch(function (e) {
+      toast("失败：" + e.message + "（常见原因：Key 无效 / 模型名不对 / 接口不允许浏览器直连）");
+    });
+  });
+
+  fillSet();
+  doParse();
+})();
+</script>
+</body>
+</html>
