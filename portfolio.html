@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="刘乐·武昌理工学院计算机科学与技术 2027 届·AI Agent / 大模型应用开发方向求职作品集：4 个 7×24 云端运行的个人项目、9 个案例实录、40+ 项定制交付，全部截图来自真实运行产出。">
+<meta name="author" content="刘乐">
+<meta name="theme-color" content="#2563eb">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="刘乐 · AI Agent 应用开发 · 个人作品资料库">
+<meta property="og:description" content="4 个云端运行的个人项目、9 个案例实录、40+ 项定制交付——每一句都能对上实物。">
+<meta property="og:url" content="http://124.220.191.183:8000/portfolio.html">
+<title>刘乐 · AI Agent 应用开发 · 个人作品资料库</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+    color: #1f2937;
+    background: #f7f8fa;
+    line-height: 1.7;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* ===== Hero ===== */
+  .hero {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
+    color: #fff;
+    padding: 60px 0 50px;
+  }
+  .hero h1 { font-size: clamp(30px, 5vw, 44px); letter-spacing: 2px; margin-bottom: 6px; }
+  .hero .tagline { font-size: clamp(15px, 2.4vw, 18px); opacity: .92; margin-bottom: 10px; }
+  .hero .intro { font-size: 15px; opacity: .85; max-width: 660px; margin-bottom: 18px; }
+  .hero .proof {
+    font-size: 13px; opacity: .8;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+    display: inline-block; border-radius: 999px; padding: 5px 16px; margin-bottom: 22px;
+  }
+  .hero .contact-line { font-size: 14px; opacity: .9; margin-bottom: 6px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+  .stat {
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .stat .num { font-size: clamp(20px, 3vw, 28px); font-weight: 700; }
+  .stat .label { font-size: 12.5px; opacity: .85; margin-top: 4px; }
+
+  /* ===== 导航 ===== */
+  .nav {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky; top: 0; z-index: 10;
+    overflow-x: auto; white-space: nowrap;
+  }
+  .nav-inner { max-width: 960px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 24px; }
+  .nav a { color: #374151; text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav a:hover { color: #2563eb; }
+
+  /* ===== 区块通用 ===== */
+  section { padding: 52px 0; }
+  section.alt { background: #fff; }
+  .sec-label { color: #2563eb; font-size: 13px; font-weight: 700; letter-spacing: 3px; margin-bottom: 8px; }
+  h2.sec-title { font-size: clamp(22px, 3.4vw, 28px); margin-bottom: 12px; }
+  .sec-desc { color: #6b7280; font-size: 14.5px; max-width: 740px; margin-bottom: 30px; }
+
+  /* ===== 项目卡 ===== */
+  .project {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  section.alt .project { background: #f9fafb; }
+  .project-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  .project-title { font-size: 19px; font-weight: 700; }
+  .project-title .pnum { color: #2563eb; font-family: Georgia, serif; margin-right: 8px; }
+  .project-sub { font-size: 13px; color: #2563eb; font-weight: 600; }
+  .project-oneline { color: #374151; font-size: 14.5px; margin: 8px 0 14px; }
+  .project ul { padding-left: 20px; }
+  .project li { font-size: 14px; color: #374151; margin-bottom: 7px; }
+  .project li b { color: #111827; }
+  .tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    background: #eff6ff; color: #1d4ed8;
+    font-size: 12px; font-weight: 500;
+    padding: 4px 12px; border-radius: 999px;
+    border: 1px solid #bfdbfe;
+  }
+
+  /* ===== 工作台手机截图 ===== */
+  .phone-shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; margin-top: 22px; }
+  .phone-shot {
+    width: 100%;
+    border: 8px solid #111827;
+    border-radius: 26px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    background: #111827;
+  }
+  .phone-shot img {
+    width: 100%; height: 500px;
+    object-fit: cover; object-position: top center;
+    display: block; cursor: zoom-in;
+  }
+  .shot-caption { font-size: 12px; color: #6b7280; margin-top: 10px; text-align: center; min-height: 36px; }
+
+  /* ===== 案例实录 ===== */
+  .case {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 26px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .case-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+  .case-title { font-size: 17.5px; font-weight: 700; }
+  .case-title .cnum {
+    display: inline-block; background: #2563eb; color: #fff;
+    font-size: 12px; border-radius: 6px; padding: 2px 9px; margin-right: 10px;
+    vertical-align: 2px; letter-spacing: 1px;
+  }
+  .case-kind { font-size: 12px; color: #9ca3af; font-weight: 600; letter-spacing: 1px; }
+  .case-desc { font-size: 14px; color: #374151; margin: 12px 0 6px; }
+  .case-desc b { color: #111827; }
+  .case-points { padding-left: 20px; margin-top: 4px; }
+  .case-points li { font-size: 13.5px; color: #4b5563; margin-bottom: 5px; }
+  .case-shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+  .case-shots figure { text-align: center; }
+  .case-shots .frame {
+    border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;
+    background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .case-shots figcaption { font-size: 12px; color: #9ca3af; margin-top: 8px; }
+  .case-shots .frame img { width: 100%; }
+
+  /* ===== 可验证性条 ===== */
+  .verify {
+    margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 11px 16px;
+    font-size: 12.5px; color: #166534; line-height: 1.6;
+  }
+  .verify .vk {
+    flex: 0 0 auto; font-weight: 700; color: #15803d; background: #dcfce7;
+    border-radius: 6px; padding: 2px 9px; font-size: 11.5px; letter-spacing: .5px;
+  }
+  .verify a { color: #15803d; }
+
+  /* ===== 无截图案例的参数条（视觉配平） ===== */
+  .case-strip {
+    margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: #e5e7eb; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;
+  }
+  .case-strip > div { background: #f9fafb; padding: 12px 14px; }
+  .case-strip .sk { font-size: 11.5px; color: #9ca3af; margin-bottom: 3px; }
+  .case-strip .sv { font-size: 13px; font-weight: 600; color: #111827; line-height: 1.45; }
+
+  /* ===== 回到顶部 ===== */
+  #toTop {
+    position: fixed; right: 18px; bottom: 22px; z-index: 500;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: #2563eb; color: #fff; border: none; cursor: pointer;
+    font-size: 16px; line-height: 1; box-shadow: 0 4px 14px rgba(37,99,235,.35);
+    opacity: 0; pointer-events: none; transition: opacity .22s;
+  }
+  #toTop.on { opacity: 1; pointer-events: auto; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+  /* ===== 图片加载失败兜底 ===== */
+  .img-fail {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    min-height: 120px; padding: 18px; background: #f3f4f6; border: 1px dashed #d1d5db;
+    border-radius: 8px; color: #9ca3af; font-size: 12.5px; line-height: 1.6;
+  }
+
+  /* ===== 灯箱 ===== */
+  #lb {
+    display: none; position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(17,24,39,.9); z-index: 999;
+    align-items: center; justify-content: center;
+    padding: 18px;
+  }
+  #lb .lb-box {
+    position: relative; width: 100%; max-width: 520px;
+    max-height: 94vh; background: #fff; border-radius: 14px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  #lb .lb-bar {
+    flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; background: #f3f4f6; border-bottom: 1px solid #e5e7eb;
+  }
+  #lb .lb-bar .t { font-size: 13px; font-weight: 600; color: #111827; }
+  #lb .lb-bar button {
+    border: none; background: #e5e7eb; color: #374151;
+    font-size: 12.5px; padding: 5px 14px; border-radius: 8px; cursor: pointer;
+  }
+  #lb .lb-body { flex: 1 1 auto; overflow: auto; -webkit-overflow-scrolling: touch; display: flex; align-items: flex-start; justify-content: center; background: #f7f8fa; }
+  #lb .lb-body img { display: block; max-width: 100%; max-height: 84vh; width: auto; height: auto; margin: 0 auto; cursor: zoom-in; }
+  #lb .lb-body img.zoomed { max-width: none; max-height: none; cursor: zoom-out; }
+  .case-shots .frame img, .phone-shot img { cursor: zoom-in; }
+
+  /* ===== 日报节选卡 ===== */
+  .report-card {
+    margin-top: 20px;
+    border: 1px solid #d1d5db; border-radius: 12px;
+    background: #fff; padding: 22px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    font-size: 13.5px;
+  }
+  .report-card .rp-head {
+    display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px;
+    border-bottom: 2px solid #111827; padding-bottom: 10px; margin-bottom: 14px;
+  }
+  .report-card .rp-title { font-size: 15.5px; font-weight: 700; }
+  .report-card .rp-meta { font-size: 12px; color: #6b7280; }
+  .rp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .rp-kpi { background: #f3f4f6; border-radius: 8px; padding: 10px 12px; }
+  .rp-kpi .k { font-size: 11.5px; color: #6b7280; }
+  .rp-kpi .v { font-size: 14.5px; font-weight: 700; margin-top: 2px; }
+  .rp-kpi .v.down { color: #16a34a; }
+  .rp-kpi .v.risk { color: #dc2626; }
+  .rp-tone {
+    background: #fef2f2; border-left: 3px solid #dc2626; border-radius: 0 8px 8px 0;
+    padding: 10px 14px; color: #7f1d1d; font-size: 12.5px; line-height: 1.6; margin-bottom: 14px;
+  }
+  .rp-item { border-top: 1px dashed #d1d5db; padding-top: 12px; }
+  .rp-item .it-name { font-weight: 700; font-size: 13.5px; margin-bottom: 6px; }
+  .rp-item .it-line { color: #374151; font-size: 12.5px; margin-bottom: 4px; }
+  .rp-item .it-line b { color: #111827; }
+  .rp-item .it-suggest {
+    display: inline-block; background: #fefce8; border: 1px solid #fde68a;
+    border-radius: 6px; padding: 3px 10px; font-size: 12px; color: #854d0e; margin: 4px 0 6px;
+  }
+  .rp-item .it-reasons { color: #6b7280; font-size: 12px; }
+  .rp-foot { margin-top: 14px; font-size: 11.5px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 10px; }
+
+  /* ===== 交付类别 ===== */
+  .deliver-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .deliver-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 22px;
+  }
+  .deliver-card h3 { font-size: 15.5px; margin-bottom: 4px; }
+  .deliver-card .cnt { font-size: 12px; color: #2563eb; font-weight: 700; margin-bottom: 10px; }
+  .deliver-card ul { padding-left: 18px; }
+  .deliver-card li { font-size: 13.5px; color: #4b5563; margin-bottom: 5px; }
+
+  /* ===== 交付流程 ===== */
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 34px; }
+  .flow-step { text-align: center; position: relative; }
+  .flow-step .dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #2563eb; color: #fff;
+    font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+  }
+  .flow-step .ft { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+  .flow-step .fd { font-size: 12px; color: #6b7280; line-height: 1.5; }
+  .deliver-note {
+    margin-top: 26px; font-size: 13px; color: #6b7280;
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: 10px; padding: 12px 16px;
+  }
+
+  /* ===== 方法论 ===== */
+  .loop-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .loop-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px;
+  }
+  .loop-card .step-no {
+    display: inline-block; font-size: 12px; font-weight: 700; color: #2563eb;
+    background: #eff6ff; border-radius: 6px; padding: 2px 10px; margin-bottom: 10px;
+  }
+  .loop-card h3 { font-size: 15px; margin-bottom: 6px; }
+  .loop-card p { font-size: 13px; color: #6b7280; }
+  .method-data {
+    margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .md-item { background: #eff6ff; border-radius: 10px; padding: 16px; text-align: center; }
+  .md-item .n { font-size: 22px; font-weight: 700; color: #1d4ed8; }
+  .md-item .t { font-size: 12.5px; color: #374151; margin-top: 3px; }
+
+  /* ===== 技能 ===== */
+  .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .skill-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+  .skill-card h3 { font-size: 15px; margin-bottom: 8px; }
+  .skill-card h3 span { margin-right: 8px; }
+  .skill-card p { font-size: 13.5px; color: #4b5563; }
+
+  /* ===== 教育 ===== */
+  .edu-card {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 22px;
+  }
+  .edu-card .school { font-size: 16px; font-weight: 700; }
+  .edu-card .major { font-size: 13.5px; color: #6b7280; margin-top: 3px; }
+  .edu-card .date { font-size: 13px; color: #6b7280; }
+
+  /* ===== 页脚 ===== */
+  footer {
+    background: #111827; color: #9ca3af;
+    padding: 44px 0 36px; margin-top: 40px;
+  }
+  footer .cta { color: #fff; font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+  footer .contact { font-size: 14.5px; line-height: 2; }
+  footer .contact b { color: #f3f4f6; font-weight: 600; }
+  footer .fine { font-size: 12px; color: #6b7280; margin-top: 22px; }
+
+  /* ===== 移动端 ===== */
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .deliver-grid { grid-template-columns: 1fr; }
+    .loop-grid { grid-template-columns: 1fr; }
+    .method-data { grid-template-columns: 1fr; }
+    .skill-grid { grid-template-columns: 1fr; }
+    .case-shots { grid-template-columns: 1fr; }
+    .case-strip { grid-template-columns: 1fr; }
+    .verify { font-size: 12px; }
+    #toTop { right: 12px; bottom: 14px; }
+    .phone-shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .flow { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .flow-step:nth-child(5) { grid-column: span 2; }
+    section { padding: 40px 0; }
+    .project, .case { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <div class="container">
+    <h1>刘乐</h1>
+    <div class="tagline">AI Agent / 大模型应用开发 · 实习求职中</div>
+    <div class="intro">
+      计算机科学与技术 2027 届本科生。擅长以「AI Agent 协作开发」的方式把需求做成真实产品——
+      负责需求拆解、任务派发与功能验收，完整跑通从想法到部署上线的闭环。多个个人项目全部部署在我的腾讯云服务器上 7×24 运行。
+    </div>
+    <div class="proof">📷 页面所有截图均为真实运行产出，非设计稿</div>
+    <div class="contact-line">📱 187-7171-8390 &nbsp;&nbsp; ✉️ 2827110018@qq.com &nbsp;&nbsp; 📍 湖北武汉</div>
+    <div class="stats">
+      <div class="stat"><div class="num">4 个</div><div class="label">完整个人项目<br>（全部云端运行中）</div></div>
+      <div class="stat"><div class="num">40+ 项</div><div class="label">定制开发交付<br>（含部署文档）</div></div>
+      <div class="stat"><div class="num">200+</div><div class="label">AI 协作开发会话<br>（近一个月）</div></div>
+      <div class="stat"><div class="num">20 个</div><div class="label">Agent 工具函数<br>封装落地</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 导航 ===== -->
+<div class="nav">
+  <div class="nav-inner">
+    <a href="#projects">个人作品</a>
+    <a href="#cases">案例实录</a>
+    <a href="#delivery">定制交付全景</a>
+    <a href="#method">协作方法论</a>
+    <a href="#skills">技能</a>
+    <a href="#edu">教育背景</a>
+  </div>
+</div>
+
+<!-- ===== 个人作品 ===== -->
+<section id="projects">
+  <div class="container">
+    <div class="sec-label">PROJECTS</div>
+    <h2 class="sec-title">个人作品</h2>
+    <p class="sec-desc">四个从 0 到 1 完整落地的项目，全部部署在我的腾讯云服务器上 7×24 运行：两个考察 Agent 核心链路（工具调用 / 防幻觉取数），两个考察「用 Agent 的方式做产品」与工程化交付。</p>
+
+    <div class="project">
+      <div class="project-head">
+        <div class="project-title"><span class="pnum">01</span>智能对话助手 · 多模态 AI Agent</div>
+        <div class="project-sub">2026.06 - 至今</div>
+      </div>
+      <div class="project-sub">Python / DeepSeek API / Gradio &nbsp;·&nbsp; 个人独立项目（云端运行中）</div>
+      <div class="project-oneline">基于 DeepSeek Function Calling 的工具调用 Agent，跑通「需求识别 → 工具调用 → 结果返回」完整链路，已部署云端双端点长期运行。</div>
+      <ul>
+        <li><b>20 个工具函数：</b>按四类封装——查询类（天气 / 时间 / 地理编码 / 逆地理 / 周边搜索 / 路线规划 / 联网搜索 7 个）、内容类（视频解析下载 抖音·B 站·快手无水印、文案生成、图片生成、视频生成、语音合成、OCR、图片理解 8 个）、文档类（入库 / 列目录 / 知识库检索 3 个）、计算类（计算器 / 字数统计 2 个），统一注册进 Function Calling 供 Agent 自主调度。</li>
+        <li><b>轻量 RAG 知识库：</b>文档分块（500 字窗口 + 100 字重叠）+ 中文 bigram 分词 + BM25 相关性打分，不依赖向量库即可完成个人文档问答，支持动态增删与索引重建。</li>
+        <li><b>对话记忆工程：</b>SQLite 持久化聊天记录，刷新页面 / 重启服务不丢上下文，支持最近 20 次历史会话回看。</li>
+        <li><b>工程与安全意识：</b>排查修复 10 处缺陷（含密钥硬编码、eval 注入、指数爆炸风险）；以 AST 白名单求值替代 eval，密钥统一迁移 .env，编写自动化回归测试；部署端纳入 supervisord 托管，实现崩溃自愈与开机自启。</li>
+      </ul>
+      <div class="report-card">
+        <div class="rp-head">
+          <div class="rp-title">📱 工作台 AI 助手 · 真实实测（视频工具链）</div>
+          <div class="rp-meta">2026-10-23 对生产环境接口的真实调用 · 非演示数据</div>
+        </div>
+        <div class="rp-item">
+          <div class="it-name">测试 1 · 抖音分享口令 → 无水印视频直链</div>
+          <div class="it-line"><b>输入：</b>抖音 App 分享文本（含短链）原样发送</div>
+          <div class="it-line"><b>输出：</b>解析成功，返回无水印 mp4 直链（douyinvod CDN）+ 标题提取「I like to eat🍨🍉🍹🍖🌽」，并主动询问是否需要提取文案</div>
+        </div>
+        <div class="rp-item">
+          <div class="it-name">测试 2 · 链接 +「完整提取文案」</div>
+          <div class="it-line"><b>输入：</b>另一条抖音分享文本 +「完整提取文案」指令</div>
+          <div class="it-line"><b>输出：</b>完整口播文案：「想知道130平，想要实现语音或者远程控制灯光，需要一个智能开关，再加客厅主卧智能窗帘两套，可以实现视频通话远程看家。点点关注。」</div>
+        </div>
+        <div class="rp-foot">
+          视频解析工具（media_tool）自动识别分享口令 → 解析无水印源 → 可选生成文案脚本（概览 / 看点 / 爆款标题 / 小红书文案 / 口播 / 分镜），是 20 个工具函数中的两个。
+        </div>
+      </div>
+      <div class="verify"><span class="vk">怎么验证</span>云端双端点长期运行，工作台里的「AI 助手」模块调用的就是同一套服务；面试时可现场发一条抖音分享口令，当场看解析结果；对话历史落 SQLite，可回看最近 20 次会话。</div>
+      <div class="tags">
+        <span class="tag">Function Calling</span><span class="tag">RAG</span><span class="tag">BM25</span><span class="tag">Prompt Engineering</span><span class="tag">SQLite 记忆持久化</span><span class="tag">云端托管</span>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <div class="project-title"><span class="pnum">02</span>个人工作台 · 多模块效率系统（Web + Android）</div>
+        <div class="project-sub">2026.10</div>
+      </div>
+      <div class="project-sub">腾讯云 / Python / ECharts / Android WebView &nbsp;·&nbsp; AI Agent 协作开发</div>
+      <div class="project-oneline">
+        部署在腾讯云上的个人效率系统，11 个功能模块，全程以「AI Agent 协作开发」方式完成。
+        它不是一个记录工具——我的 AI 助手、CS2 持仓分析两个独立项目都被原生适配了进来，一个入口调用全部能力。
+        App 就装在我手机上，下方为真机运行截图。
+      </div>
+      <ul>
+        <li><b>协作开发范式：</b>本人负责需求定义、任务拆解与功能验收，代码主要由 Agent 实现，经 10+ 轮迭代按期交付。</li>
+        <li><b>个人生态集成（核心亮点）：</b>工作台把我的项目串成了一个生态——<b>AI 助手</b>模块直接接入我的智能对话助手（对话 / 视频解析 / 拍图翻译 / 完整提取文案），<b>CS2 持仓</b>页实时拉取我的持仓分析系统（行情 / AI 研判 / 问一问），副业账本的智能记账服务着我的定制交付业务。</li>
+        <li><b>11 个功能模块：</b>待办打卡、副业账本（月度统计 + 近 30 天收入趋势可视化）、体重运动管理、球鞋搬砖台账、日记复盘、拍图翻译、AI 助手、行情看板等；ECharts 可视化 + 云端自动同步。</li>
+        <li><b>云端工程：</b>腾讯云 Python 服务承载行情接口、云备份 API、DeepSeek 视觉翻译接口与企业微信待办推送；Android App 支持系统通知与相机调用。</li>
+      </ul>
+      <div class="phone-shots">
+        <div>
+          <div class="phone-shot"><img src="https://workbuddy-space-static.codebuddy.work/image/E1MW5HGQ46cWSSkRLV77sP.jpg" width="1080" height="2376" alt="工作台首页真机截图：天气问候、待办、运动、副业收入概览" loading="lazy"></div>
+          <div class="shot-caption">首页：待办 / 运动 / 副业 / 日记（真机数据）</div>
+        </div>
+        <div>
+          <div class="phone-shot"><img src="https://workbuddy-space-static.codebuddy.work/image/mFi2igySGo04v7RMeW91Mm.jpg" width="1080" height="2376" alt="副业账本真机截图：月收入统计、30天趋势图、76笔流水" loading="lazy"></div>
+          <div class="shot-caption">副业账本：10 月 76 笔流水 + 30 天收入趋势</div>
+        </div>
+        <div>
+          <div class="phone-shot"><img src="https://workbuddy-space-static.codebuddy.work/image/TFTpJ68IrGHnmE61NrYNc7.jpg" width="872" height="1920" alt="CS2持仓页真机截图：实时市值、大盘环境、14天趋势、问一问入口" loading="lazy"></div>
+          <div class="shot-caption">CS2 持仓：实时行情 + AI 研判（集成我的分析系统）</div>
+        </div>
+      </div>
+      <div class="verify"><span class="vk">怎么验证</span>App 就装在本人手机上，面试时可现场打开逐模块演示；云端服务与数据同步 7×24 运行，页面截图即真机截图。</div>
+      <div class="tags">
+        <span class="tag">AI Agent 协作开发</span><span class="tag">腾讯云部署</span><span class="tag">企业微信 API</span><span class="tag">ECharts</span><span class="tag">Android</span>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <div class="project-title"><span class="pnum">03</span>CS2 饰品持仓智能分析 Agent（无人值守）</div>
+        <div class="project-sub">2026.09 - 至今 · 云端运行中</div>
+      </div>
+      <div class="project-sub">Python / SteamDT API / DeepSeek 多模型 / cron + systemd &nbsp;·&nbsp; 个人独立项目</div>
+      <div class="project-oneline">
+        每天 17:30 自动产出持仓分析日报的无人值守系统：<b>行情拉取 → 持仓同步 → 技术分析 → 独立决策 → Word 日报 → 企业微信推送</b>，
+        全链路无人工干预，已连续稳定运行 1 个月+，产出 90+ 份日报与盘中概览。这是我在「AI Agent 工程化」上投入最深的项目。
+      </div>
+      <ul>
+        <li><b>混合架构：</b>规则引擎负责事实与风控（六因子评分输出信心度与目标仓位），大模型负责解读与判断；DeepSeek 按场景配置 4 个模型档位（每日研判 / 问答 / 点评 / 复盘各用不同模型与思考模式）。</li>
+        <li><b>三层防幻觉设计：</b>① 模型只能通过 6 个工具取数，提示词禁止凭记忆报价；② 回答中的金额与百分比自动与工具返回数据交叉校验，对不上即标注「未经验证」；③ 每条回答附取数依据，用户可自行核对。</li>
+        <li><b>分级告警体系：</b>每小时盘中巡检（每天 16 次），紧急信号即时推送、温和波动汇入 12:00 / 22:00 汇总；关键信号需连续两次巡检确认才推、每日限额防打扰——真正在解决「什么时候该通知人」的问题。</li>
+        <li><b>模拟盘 A/B 双轨对照：</b>纯规则轨 vs 规则+AI 轨各 ¥3000 模拟金，遵守 T+7 锁定与平台费率，每日记录净值与操盘手记，验证 AI 参与决策是否跑赢纯规则。</li>
+        <li><b>无人值守推送纪律：</b>每日 17:30 日报摘要 + Word 报告推送企业微信；每小时巡检分级告警（紧急即时推、温和波动 12:00 / 22:00 汇总）；关键信号连续两次巡检确认才推、每日限额防打扰；周报兼作心跳检测。</li>
+        <li><b>容错与运维：</b>接口限额自动降级官网兜底、单条数据失败跳过、批量失败等待重试、cron 调度 + systemd 托管。</li>
+      </ul>
+      <div class="phone-shots">
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/XcI2iNjmvPc8TfJyP550Mb.png" data-title="问答实录 · 我的持仓整体如何？">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/XcI2iNjmvPc8TfJyP550Mb.png" width="430" height="1253" alt="持仓助手回答「我的持仓整体如何」" loading="lazy">
+          </div>
+          <div class="shot-caption">「我的持仓整体如何？」→ 持仓总览 + 操作判断</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/Imf0UHemIxm4eWKlu3SP6D.png" data-title="问答实录 · AK-47 安全网（崭新出厂）技术面">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/Imf0UHemIxm4eWKlu3SP6D.png" width="430" height="747" alt="持仓助手回答 AK-47 安全网崭新出厂技术面" loading="lazy">
+          </div>
+          <div class="shot-caption">「AK-47 安全网技术面？」→ 趋势 / 支撑压力 / 结论</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/1Ts55Ulwj8wpMZruXv3qA2.jpg" data-title="企业微信推送 · 价格异动提醒与 AI 点评">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/1Ts55Ulwj8wpMZruXv3qA2.jpg" width="1080" height="2376" alt="企业微信推送：价格异动提醒与AI点评" loading="lazy">
+          </div>
+          <div class="shot-caption">企业微信推送：价格异动 + AI 点评</div>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div class="rp-head">
+          <div class="rp-title">📄 日报节选 · 持仓分析报告</div>
+          <div class="rp-meta">2026-10-22 17:30 自动生成 · 数据源：开放平台 API + 官网统计</div>
+        </div>
+        <div class="rp-kpis">
+          <div class="rp-kpi"><div class="k">持仓总市值</div><div class="v">¥1,233.58</div></div>
+          <div class="rp-kpi"><div class="k">总浮动盈亏</div><div class="v down">-30.31%</div></div>
+          <div class="rp-kpi"><div class="k">大盘风险等级</div><div class="v risk">下降 / 高风险</div></div>
+          <div class="rp-kpi"><div class="k">数据完整性</div><div class="v">7 / 7 条</div></div>
+        </div>
+        <div class="rp-tone">
+          <b>大盘操作总基调：</b>下降周期 / 高风险——不补仓摊平成本（弱市加仓摊平是亏损扩大的主要原因）；
+          新开只接受强信号（信心 ≥3）的小仓参与，弱信号一律观望；优先持仓风控，触发止损条件果断执行。
+        </div>
+        <div class="rp-item">
+          <div class="it-name">单品分析示例 · AK-47 | 安全网（崭新出厂）</div>
+          <div class="it-line"><b>趋势判定：</b>震荡趋势（均线交叉缠绕；MA5=67.06 / MA10=63.28 / MA20=63.75）</div>
+          <div class="it-line"><b>价格位置：</b>近 6 个月区间低位（百分位 4.9%）；5 日 +23.08%，3 日 +13.28%</div>
+          <div class="it-line"><b>支撑 / 压力：</b>支撑位 ¥59.78、¥55.00、¥63.75；压力位 ¥111.00、¥129.07</div>
+          <div class="it-line"><b>流动性：</b>高（在售 3553 / 求购 260，在售量平稳）　<b>量价：</b>平量（振幅比 1.13）</div>
+          <div class="it-suggest">操作建议：🟡 持有观望　信心度 ★★☆☆☆　综合评分 +1.7</div>
+          <div class="it-reasons">
+            理由链：大盘高风险不补仓摊平 · 价格处于近 6 个月低位区间（5%）· 逆势独涨近 5 日跑赢大盘 +21.8 个百分点 · 信号偏多但尚不充分，建议小仓试探 → 维持观望，不追涨不杀跌
+          </div>
+        </div>
+        <div class="rp-foot">
+          完整日报为七段 Word 文档：大盘环境 / 持仓评估 / 单品深度分析（逐件）/ 操作建议汇总 / 风险提示 / AI 研判 / 模拟盘双轨对照——每晚 17:30 自动生成并推送企业微信，无人值守连续产出 30+ 天。
+        </div>
+      </div>
+      <div class="verify"><span class="vk">怎么验证</span>每日 17:30 自动产出并推送企业微信，历史推送记录可现场翻阅；报告站（8899 端口）可提供只读账号，查阅连续 30+ 天的日报原件。</div>
+      <div class="tags">
+        <span class="tag">Agent 防幻觉设计</span><span class="tag">Function Calling 取数</span><span class="tag">技术指标分析</span><span class="tag">分级告警</span><span class="tag">cron 无人值守</span><span class="tag">企业微信推送</span><span class="tag">systemd</span>
+      </div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <div class="project-title"><span class="pnum">04</span>千城游戏厅 · 网页游戏平台（在线运营中）</div>
+        <div class="project-sub">2026.10 上线</div>
+      </div>
+      <div class="project-sub">Node.js / WebSocket / 全栈独立开发 &nbsp;·&nbsp; <a href="http://124.220.191.183/" target="_blank" style="color:#2563eb;">🌐 线上可直接体验 →</a></div>
+      <div class="project-oneline">
+        手机优先的网页游戏大厅：<b>平台层 + 8 款游戏 + 管理后台</b>，部署在腾讯云 80 端口，
+        已有真实用户注册游玩。鼠标悬停下方截图可暂停自动滚动，点击查看完整界面。
+      </div>
+      <ul>
+        <li><b>平台层：</b>游客 / 注册双轨账号、金币与装扮小铺、段位排行榜、好友系统、联机房间（公开房 / 私密房 / 房间码邀请）、每日任务、意见反馈、公告系统（弹窗 + 已读去重）。</li>
+        <li><b>8 款游戏：</b>生气猫（卡牌）、球球大作战、大鱼吃小鱼、斗地主、五子棋、中国象棋、聚会工具箱、组队账本；五子棋 / 斗地主 / 象棋采用<b>服务端权威判定引擎</b>，杜绝作弊。</li>
+        <li><b>WebSocket 实时联机：</b>HTTP / WS 同端口单进程，好友房 + AI 补位；35 款同人小游戏聚合页（搜索 / 分类 / 热度排序，只收录跳转、版权归属原作者）。</li>
+        <li><b>管理后台：</b>数据看板（新增用户 / UV / PV / 游戏点击 / 近 7 天趋势 / 热门 Top6）、用户管理（改金币 / 重置密码 / 踢下线）、反馈处理、公告发布与下线。</li>
+        <li><b>工程化：</b>Playwright <b>8 组回归测试全部通过</b>；AI 生成全套美术资源（hero 插画 / 8 张游戏封面 / 吉祥物）；sendBeacon 埋点统计（按天留存 30 天）；部署前备份 + sha1 哈希校验。</li>
+      </ul>
+      <div class="phone-shots">
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/lHUBZblXJUfXAp53nxhjOc.jpg" data-title="千城游戏厅 · 平台大厅">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/lHUBZblXJUfXAp53nxhjOc.jpg" width="780" height="1688" alt="千城游戏厅平台大厅：游戏宫格、好友系统、联机大厅" loading="lazy">
+          </div>
+          <div class="shot-caption">平台大厅：宫格导航 + AI 生成插画主视觉</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/CbAJZaCcLCCXW8L5OuuyS5.png" data-title="千城游戏厅 · 游戏详情页（生气猫）">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/CbAJZaCcLCCXW8L5OuuyS5.png" width="780" height="1688" alt="生气猫游戏详情页：三种玩法入口与玩法说明" loading="lazy">
+          </div>
+          <div class="shot-caption">游戏详情页：单机 / 挑战 / 联机好友房</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/VCkx1XfS1vws6J2zmqCOaE.jpg" data-title="千城游戏厅 · 热门小游戏聚合页">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/VCkx1XfS1vws6J2zmqCOaE.jpg" width="780" height="1688" alt="热门小游戏聚合页：35 款奶蛙同人小游戏，搜索与分类" loading="lazy">
+          </div>
+          <div class="shot-caption">小游戏聚合页：35 款，搜索 / 分类 / 热度排序</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/OgtE91WKO7UnNkMm4BS17z.jpg" data-title="千城游戏厅 · 聚会房间（二维码邀请）">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/OgtE91WKO7UnNkMm4BS17z.jpg" width="1080" height="2376" alt="聚会工具箱房间：房间码、二维码邀请、游客直接加入" loading="lazy">
+          </div>
+          <div class="shot-caption">聚会房间：房间码 / 二维码邀请 / 游客直玩</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/07nQOzJygVFT2mno0xn528.jpg" data-title="千城游戏厅 · 休闲娱乐游戏页">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/07nQOzJygVFT2mno0xn528.jpg" width="780" height="1688" alt="休闲娱乐页：生气猫、球球大作战、大鱼吃小鱼、斗地主、五子棋、中国象棋" loading="lazy">
+          </div>
+          <div class="shot-caption">休闲娱乐页：6 款游戏，单机直玩 / 联机开房</div>
+        </div>
+        <div>
+          <div class="phone-shot" data-full="https://workbuddy-space-static.codebuddy.work/image/oB7BP8JgJopNIR2AllRFow.jpg" data-title="千城游戏厅 · 管理后台数据看板">
+            <img src="https://workbuddy-space-static.codebuddy.work/image/oB7BP8JgJopNIR2AllRFow.jpg" width="1080" height="2376" alt="管理后台数据看板：用户数、注册配额、公告、待处理反馈" loading="lazy">
+          </div>
+          <div class="shot-caption">管理后台：看板 / 用户 / 反馈 / 公告（真实运营数据）</div>
+        </div>
+      </div>
+      <div class="verify"><span class="vk">怎么验证</span>公开地址直接打开就能玩，无需注册：<a href="http://124.220.191.183/" target="_blank" rel="noopener">http://124.220.191.183/</a>；有真实用户与埋点数据，管理后台可现场演示。</div>
+      <div class="tags">
+        <span class="tag">Node.js</span><span class="tag">WebSocket 实时联机</span><span class="tag">全栈</span><span class="tag">服务端权威判定</span><span class="tag">管理后台</span><span class="tag">Playwright 回归</span><span class="tag">AI 美术生成</span><span class="tag">腾讯云部署</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 案例实录 ===== -->
+<section id="cases" class="alt">
+  <div class="container">
+    <div class="sec-label">CASE STUDIES</div>
+    <h2 class="sec-title">定制交付 · 精选案例实录</h2>
+    <p class="sec-desc">
+      从 40+ 项定制交付与课程实践中挑出 9 个案例：<b>A–D 四组附真实运行截图</b>，E–I 五组延伸实录（语音合成 / 三端平台 / 信息安全 / 数据工程 / 算法与文档自动化）。
+      涉及客户委托，仅展示运行效果与技术方案，源码与文档不公开。
+    </p>
+
+    <!-- 案例A：微博情绪分析管道 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 A</span>微博热搜话题实时情绪分析管道</div>
+        <div class="case-kind">AI × 大数据</div>
+      </div>
+      <div class="case-desc">
+        一条完整的实时处理链路：<b>爬虫采集 → Kafka 消息队列 → Spark 流式计算 → 双模型情感分类 → Flask 可视化大屏（30 秒自动刷新）</b>。
+      </div>
+      <ul class="case-points">
+        <li>采集端（crawler）持续抓取热搜话题与讨论文本，经清洗后由 Kafka producer 写入主题，consumer 逐条消费计算情绪得分</li>
+        <li>情感分类做了<b>朴素贝叶斯与 SVM 双模型对比</b>，模型评估报告输出指标差异；每批次 100 条结果聚合写入结果集</li>
+        <li>Flask 可视化页按 30 秒节奏自动刷新排行榜，得分 0~1 标准化（红色偏正面 / 绿色偏负面）</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/dfCYMiIuERsIVphxJNBGty.png" width="1887" height="1064" alt="微博热搜情绪得分实时排行榜大屏" loading="lazy"></div>
+          <figcaption>实时情绪得分排行榜（30 秒自动刷新）</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/m5IJZ6HQnA9QPY4uKusNSc.png" width="799" height="463" alt="情感模型评估结果" loading="lazy"></div>
+          <figcaption>模型评估结果</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">Kafka</span><span class="tag">Spark 流式计算</span><span class="tag">朴素贝叶斯 / SVM</span><span class="tag">Flask 可视化</span><span class="tag">爬虫</span>
+      </div>
+    </div>
+
+    <!-- 案例B：中医药RAG问答 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 B</span>中医药领域知识库问答系统</div>
+        <div class="case-kind">RAG × 向量检索</div>
+      </div>
+      <div class="case-desc">
+        领域知识问答系统：<b>RAG 检索服务 + 向量数据库 + SpringBoot 管理后台</b>，
+        支持上传 PDF 知识文档，问答结果标注知识库检索来源，可审计问答日志。
+      </div>
+      <ul class="case-points">
+        <li>业务后台覆盖药材、方剂、病历管理与<b>角色权限</b>（管理员 / 医师分级，医师仅管理本人病历）</li>
+        <li>管理员可上传 PDF 知识文档累积入库；回答携带「知识库检索来源」标注可溯源；问题含代码相关关键词时自动切换代码生成链路</li>
+        <li><b>一键启动便携打包：</b>运行时内置 JDK + Python + <b>Qdrant 向量数据库</b>，start / stop.bat 一键编排问答服务、管理服务与向量库三个进程，客户零配置双击即跑；交付附部署与使用教程两份文档</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/XSfR1YEFUOtLBBMk6awmvP.png" width="1600" height="900" alt="中医药AI智能问答界面，含知识库检索来源标注与PDF上传" loading="lazy"></div>
+          <figcaption>AI 智能问答（检索来源标注 + PDF 知识上传）</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/8ZZESjDJNn1LstRHFILQyb.png" width="1600" height="900" alt="中医药系统首页看板" loading="lazy"></div>
+          <figcaption>首页数据看板</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">RAG</span><span class="tag">向量数据库</span><span class="tag">SpringBoot</span><span class="tag">PDF 解析入库</span><span class="tag">可溯源问答</span><span class="tag">角色权限</span><span class="tag">便携打包</span>
+      </div>
+    </div>
+
+    <!-- 案例C：物业工单 + 外卖 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 C</span>社区物业报修工单系统（同类交付 6+ 套）</div>
+        <div class="case-kind">全栈管理系统</div>
+      </div>
+      <div class="case-desc">
+        全流程工单闭环：<b>住户报修 → 管理员派单 → 维修工处理 → 住户评价</b>，
+        支持按类型 / 状态 / 紧急程度多维筛选；交付 ER 图与业务流程图设计。同类管理系统累计交付 6+ 套。
+      </div>
+      <ul class="case-points">
+        <li>工单全生命周期状态流转（处理中 / 已完成 / 已评价），紧急程度色标分级</li>
+        <li>同类交付还包括：校园外卖点餐（在线点餐 / 购物车 / 订单管理）、宠物寄养托管、电费收费、图书借阅、超市零售等</li>
+        <li>均交付「源码 + 部署文档 + 使用教程」，客户可自行修改运行</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/4grfu8KEpVjIndLyeKYuJN.png" width="1440" height="900" alt="物业工单管理列表页，含状态与紧急程度色标" loading="lazy"></div>
+          <figcaption>工单管理（状态色标 + 多维筛选 + 分页）</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/cwLVy7TqTC07yK7DsJRxIq.png" width="1600" height="800" alt="校园外卖在线点餐页面" loading="lazy"></div>
+          <figcaption>同类交付：校园外卖在线点餐</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">SpringBoot</span><span class="tag">MySQL</span><span class="tag">工单流转</span><span class="tag">ER 图设计</span><span class="tag">Vue</span>
+      </div>
+    </div>
+
+    <!-- 案例D：MNIST -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 D</span>卷积神经网络手写数字识别</div>
+        <div class="case-kind">机器学习</div>
+      </div>
+      <div class="case-desc">
+        从零搭建 CNN 完成训练与推理：<b>10 轮 epoch 训练、loss 持续收敛</b>，
+        支持<b>自绘数字端到端识别</b>（原图 → 预处理 → 预测输出）。
+      </div>
+      <ul class="case-points">
+        <li>训练全程留痕：逐 epoch loss 曲线、批次测试输出、终端运行日志</li>
+        <li>识别端到端验证：自绘数字经预处理后输入模型，正确输出预测结果</li>
+        <li>交付含 <b>23 页实验报告（25 张运行图 / 6220 字）</b>：流程、代码、图表、结论十个环节闭环</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/AY7H9O46sM7wzZJXlvjpfO.png" width="840" height="480" alt="10轮训练的loss收敛曲线" loading="lazy"></div>
+          <figcaption>训练 loss 收敛曲线（10 轮 epoch）</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="https://workbuddy-space-static.codebuddy.work/image/aIaUXJ8OshnqF0Wcx00dTT.png" width="264" height="336" alt="自绘手写数字3被正确识别为3" loading="lazy" style="width:220px; margin:0 auto;"></div>
+          <figcaption>自绘数字端到端识别（预测：3 ✓）</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">PyTorch</span><span class="tag">CNN</span><span class="tag">MNIST</span><span class="tag">模型训练</span><span class="tag">图像预处理</span>
+      </div>
+    </div>
+
+    <!-- 案例E：心语EchoMind -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 E</span>心语 EchoMind · 情绪陪伴语音合成应用</div>
+        <div class="case-kind">AI 应用 × 容错设计</div>
+      </div>
+      <div class="case-desc">
+        把「情绪」量化为可调的声学参数：<b>情感标签 + 语速 / 音调 / 音量 / 停顿</b>五维模型，
+        用户以 20-100 强度滑块连续调节而非档位跳变，文本侧再做轻度语气润色让韵律贴合情绪。
+      </div>
+      <ul class="case-points">
+        <li><b>三级引擎降级链</b>：火山引擎 BigTTS（模型级情感，主引擎）→ Edge-TTS 神经网络（备用，额度耗尽自动接管）→ Windows SAPI（离线兜底），任一级不可用都不影响出声</li>
+        <li>Flask Web 应用：参数滑块实时合成、合成结果 MP3 归档回放；密钥 .env 管理，交付可运行包 + 结题材料</li>
+        <li>设计取向：情绪不是标签而是参数组合，「基准值 + 强度缩放」让同类情绪之间也有平滑过渡</li>
+      </ul>
+      <div class="case-strip">
+        <div><div class="sk">引擎降级链</div><div class="sv">火山 BigTTS → Edge-TTS → SAPI</div></div>
+        <div><div class="sk">情绪参数化</div><div class="sv">5 维声学参数 · 20–100 连续可调</div></div>
+        <div><div class="sk">交付形态</div><div class="sv">Flask 可运行包 + 结题材料</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag">Flask</span><span class="tag">TTS 语音合成</span><span class="tag">三级降级</span><span class="tag">火山引擎 / Edge-TTS</span><span class="tag">参数化情感</span>
+      </div>
+    </div>
+
+    <!-- 案例F：星禾屿三端平台 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 F</span>星禾屿 · 动漫资讯与番剧推荐平台（三端）</div>
+        <div class="case-kind">全栈 × 三端</div>
+      </div>
+      <div class="case-desc">
+        毕业设计级三端项目：<b>用户端（Vue3 + Vite）+ 管理端（独立 Vue 应用）+ Express 后端</b>，
+        含番剧推荐、资讯浏览与后台内容管理，附 seed 数据脚本与运行日志。
+      </div>
+      <ul class="case-points">
+        <li>后端 Express + CORS 跨域配置，RESTful 接口支撑双前端；数据用 seed.js 一键初始化</li>
+        <li>用户端与管理端独立工程、独立构建，职责分离便于多人协作与后续扩展</li>
+        <li>交付含三端源码、构建配置与运行日志，可直接 npm install 后跑通</li>
+      </ul>
+      <div class="case-strip">
+        <div><div class="sk">端架构</div><div class="sv">3 端独立工程（双前端 + 后端）</div></div>
+        <div><div class="sk">技术栈</div><div class="sv">Vue3 + Vite + Express + CORS</div></div>
+        <div><div class="sk">可跑通性</div><div class="sv">seed.js 一键初始化数据</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag">Vue3</span><span class="tag">Vite</span><span class="tag">Express</span><span class="tag">三端架构</span><span class="tag">毕业设计</span>
+      </div>
+    </div>
+
+    <!-- 案例G：网络编程与信息安全 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 G</span>网络编程与信息安全实践</div>
+        <div class="case-kind">安全 × 系统编程</div>
+      </div>
+      <div class="case-desc">
+        三组底层向实践：<b>基于 ECDHE 的前向保密聊天工具</b>、Linux 多用户聊天室（课程设计）、
+        银行存取款系统（团队课设，含框架与接口设计报告）。
+      </div>
+      <ul class="case-points">
+        <li>ECDHE 工具：X25519 临时密钥协商 + 会话密钥指纹展示（每次会话指纹不同，证明前向保密）+ AES-GCM 加密传输（Wireshark 抓包只见 base64 密文与 12 字节 nonce）+ 会话结束密钥内存清零销毁</li>
+        <li>Linux 聊天室：server / client 多用户通信、聊天日志落盘，附演示流程与答辩问答稿；银行存取款课设输出框架与接口设计报告、团队分工文档</li>
+        <li>算法实践：自来水管道架设问题用 Prim / Kruskal 双方案求解并出对比截图（最小生成树 DAG 可视化）</li>
+      </ul>
+      <div class="case-strip">
+        <div><div class="sk">密钥协商</div><div class="sv">X25519 ECDHE 临时密钥</div></div>
+        <div><div class="sk">传输加密</div><div class="sv">AES-GCM + 12 字节 nonce</div></div>
+        <div><div class="sk">验证手段</div><div class="sv">Wireshark 抓包仅见密文</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag">ECDHE / X25519</span><span class="tag">AES-GCM</span><span class="tag">前向保密</span><span class="tag">Wireshark 验证</span><span class="tag">Socket 编程</span><span class="tag">最小生成树</span>
+      </div>
+    </div>
+
+    <!-- 案例H：数据工程与机器学习 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 H</span>数据工程 pipeline 与机器学习实验组</div>
+        <div class="case-kind">数据工程 × ML</div>
+      </div>
+      <div class="case-desc">
+        <b>城市气象观测数据集预处理</b>：探查 → 清洗 → 变换 → 集成 → 降维五模块 pipeline，
+        配套组员分工表、数据集分析报告、需求分析、概要设计、详细设计、测试用例与结果表全套文档链。
+      </div>
+      <ul class="case-points">
+        <li>垃圾短信文本分类多算法对比：逻辑回归（AUC 0.82）/ 决策树（Acc 0.897）/ 随机森林等横向评测，输出 ROC 曲线与 5 折交叉验证指标</li>
+        <li>电信客户流失预测：precision / recall / F1 / AUC 全指标评估 + 训练耗时统计；另有太阳黑子 LSTM 时间序列、卷积神经网络图像分类（见案例 D）</li>
+        <li>企业年报 LLM 分析：新浪财经爬取 + 茅台（600519）年报 PDF 解析，三源交叉核对数据一致性并输出核对表</li>
+        <li>PPDA 足球数据分析：Wyscout 事件数据五大联赛（仅英超即 64 万+ 条事件），按规则实现逼抢强度指标——坐标换算圈定统计区域、排除界外 / 角球 / 任意球传球、四类防守动作去重计次，Jupyter Notebook 全流程</li>
+      </ul>
+      <div class="case-strip">
+        <div><div class="sk">气象 pipeline</div><div class="sv">5 模块 + 全套文档链</div></div>
+        <div><div class="sk">分类模型对比</div><div class="sv">LR AUC 0.82 / 决策树 Acc 0.897</div></div>
+        <div><div class="sk">足球事件数据</div><div class="sv">英超 64 万+ 条</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag">数据清洗 / 集成</span><span class="tag">逻辑回归 / 决策树 / 随机森林</span><span class="tag">ROC / 交叉验证</span><span class="tag">LLM 文档解析</span><span class="tag">Wyscout 事件数据</span><span class="tag">全文档链交付</span>
+      </div>
+    </div>
+
+    <!-- 案例I：算法实验与办公文档自动化 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 I</span>算法实验与办公文档自动化交付</div>
+        <div class="case-kind">算法 × 文档工程</div>
+      </div>
+      <div class="case-desc">
+        两类看似不同、内核相同的交付：<b>把确定性的工作交给自己写代码 / 写脚本</b>——
+        算法题用 Python 实现 + 截图验证，Word 公文排版用模板与样式规则批量处理。
+      </div>
+      <ul class="case-points">
+        <li>算法分析实验（Python）：最大子数组和（分治）、任务调度、背包问题、八皇后（回溯）四题，附运行截图与实验报告</li>
+        <li>办公文档自动化：新闻稿排版、行政处罚法公文、出入境证件申请表、图文混排小报等 Word 处理交付——按公文样式规范排版，交付 PDF 预览 + 源文件</li>
+        <li>数据库与语言基础：人大金仓（KingbaseES）国产数据库实验、C 语言基础系列实验、线性表 / 算法课程实验</li>
+        <li>数据挖掘调研：RAG 方向技术调研报告（3000-5000 字）与 Sarker (2021) 综述算法图谱，采用「AI 起草 + 人工逐条核验事实」协作流程并附完整使用声明</li>
+      </ul>
+      <div class="case-strip">
+        <div><div class="sk">算法实验</div><div class="sv">4 题（分治 / 调度 / 背包 / 回溯）</div></div>
+        <div><div class="sk">文档自动化</div><div class="sv">公文 / 证件表 / 新闻稿排版</div></div>
+        <div><div class="sk">数据库实践</div><div class="sv">KingbaseES 国产库实验</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag">分治 / 回溯 / DP</span><span class="tag">Python</span><span class="tag">Word 排版交付</span><span class="tag">KingbaseES</span><span class="tag">AI 协作流程文档化</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 定制交付全景 ===== -->
+<section id="delivery">
+  <div class="container">
+    <div class="sec-label">DELIVERY</div>
+    <h2 class="sec-title">定制交付全景 · 40+ 项</h2>
+    <p class="sec-desc">
+      课余时间为有明确需求的客户完成小型软件定制开发，全部按期交付，
+      每一项都附带「源码 + 部署文档 + 使用教程」三件套。
+    </p>
+
+    <div class="deliver-grid">
+      <div class="deliver-card">
+        <h3>🤖 AI / 机器学习应用</h3>
+        <div class="cnt">RAG 问答 · 情感分析 · 语音合成 · 时间序列</div>
+        <ul>
+          <li>中医药知识库问答系统（RAG + 向量库，见案例 B）</li>
+          <li>微博热搜实时情绪分析管道（Kafka + Spark，见案例 A）</li>
+          <li>心语 EchoMind 情绪语音合成（三级引擎降级，见案例 E）</li>
+          <li>LSTM 时间序列预测（太阳黑子，见案例 M）、卷积神经网络实验（见案例 D）</li>
+          <li>垃圾短信分类多算法对比（见案例 L）、电信客户流失预测（ROC / 交叉验证）</li>
+        </ul>
+      </div>
+      <div class="deliver-card">
+        <h3>🛠️ 全栈管理系统</h3>
+        <div class="cnt">8+ 套可运行管理系统</div>
+        <ul>
+          <li>社区物业报修工单系统、校园外卖点餐系统（见案例 C）、图书借阅（见案例 J）、实验室设备预约（见案例 K）</li>
+          <li>星禾屿动漫资讯平台（三端：双前端 + Express，见案例 F）</li>
+          <li>宠物寄养托管平台（含<b>客户审阅版 / 修改留底</b>两版对照的交付流程）、电费收费管理系统</li>
+          <li>图书借阅管理系统、小型超市零售信息系统</li>
+        </ul>
+      </div>
+      <div class="deliver-card">
+        <h3>📊 数据分析</h3>
+        <div class="cnt">Python 分析 · 调研报告 · 数据 pipeline</div>
+        <ul>
+          <li>城市气象数据预处理 pipeline（五模块 + 全套文档链，见案例 H）</li>
+          <li>企业年报 LLM 分析（年报 PDF 解析 + 三源核对）</li>
+          <li>PPDA 足球事件数据分析（Wyscout 五大联赛，英超 64 万+ 条，见案例 H）</li>
+          <li>Python 数据分析实验、市场调查综合分析报告（含超市销售监控看板）、AJ 公司财务分析</li>
+        </ul>
+      </div>
+      <div class="deliver-card">
+        <h3>🧪 软件测试与底层实践</h3>
+        <div class="cnt">单元测试 · 接口测试 · 网络与算法</div>
+        <ul>
+          <li>JUnit 单元测试：正常 / 边界 / null / 溢出多类输入覆盖，真实运行全通过</li>
+          <li>Postman 接口测试：断言脚本 + 数据驱动批量运行，附测试记录表</li>
+          <li>ECDHE 前向保密聊天工具、Linux 多用户聊天室（见案例 G）</li>
+          <li>自来水管道架设：Prim / Kruskal 双方案对比；算法四题：最大子数组分治 / 任务调度 / 背包 / 八皇后回溯（见案例 I）</li>
+          <li>银行存取款团队课设（分层架构 + 自定义异常 BankException + 类图 / 包图 / 接口图）；人大金仓 KingbaseES 国产数据库实验</li>
+          <li>办公文档自动化交付：公文排版 / 证件申请表 / 新闻稿 / 图文混排（见案例 I）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step"><div class="dot">1</div><div class="ft">需求沟通</div><div class="fd">理解目标<br>确认验收标准</div></div>
+      <div class="flow-step"><div class="dot">2</div><div class="ft">技术选型</div><div class="fd">按需求场景<br>选合适方案</div></div>
+      <div class="flow-step"><div class="dot">3</div><div class="ft">开发实现</div><div class="fd">AI Agent 协作<br>分模块推进</div></div>
+      <div class="flow-step"><div class="dot">4</div><div class="ft">真实验证</div><div class="fd">运行日志 / 截图<br>测试用例</div></div>
+      <div class="flow-step"><div class="dot">5</div><div class="ft">交付</div><div class="fd">源码 + 部署文档<br>+ 使用教程</div></div>
+    </div>
+  </div>
+</section>
+    <!-- 案例J：图书借阅管理系统 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 J</span>图书借阅管理系统</div>
+        <div class="case-kind">全栈管理系统 × 同类交付</div>
+      </div>
+      <div class="case-desc">
+        图书 / 借阅 / 读者 / 分类 / 公告五大模块的完整管理系统，<b>登录鉴权 + 角色区分（管理员 / 读者）</b>，
+        交付源码、数据库脚本、部署文档与使用教程。
+      </div>
+      <ul class="case-points">
+        <li>图书管理：书目增删改查、分类维护、库存与在架状态跟踪</li>
+        <li>借阅管理：借出 / 归还流程、逾期判定、我的借阅视图</li>
+        <li>图书检索：按书名 / 作者 / 分类多条件查询，读者端可直接检索馆藏</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lib-books.png" width="1280" height="800" alt="图书管理：书目列表与增删改查" loading="lazy"></div>
+          <figcaption>图书管理：书目列表与增删改查</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lib-borrow.png" width="1280" height="800" alt="借阅管理：借出 / 归还流程" loading="lazy"></div>
+          <figcaption>借阅管理：借出 / 归还流程</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lib-search.png" width="1280" height="800" alt="图书检索：多条件查询" loading="lazy"></div>
+          <figcaption>图书检索：多条件查询</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lib-login.png" width="1280" height="800" alt="登录鉴权（管理员 / 读者双角色）" loading="lazy"></div>
+          <figcaption>登录鉴权（管理员 / 读者双角色）</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">全栈管理系统</span><span class="tag">数据库设计</span><span class="tag">角色鉴权</span><span class="tag">源码 + 文档交付</span>
+      </div>
+    </div>
+    <!-- 案例K：实验室设备预约管理系统 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 K</span>实验室设备预约管理系统</div>
+        <div class="case-kind">全栈管理系统 × 审批流</div>
+      </div>
+      <div class="case-desc">
+        面向实验室场景的设备预约与审批系统：<b>设备台账 → 预约申请 → 审批 → 使用记录 → 使用统计</b>完整闭环，
+        附专业综合实训报告与演示视频交付。
+      </div>
+      <ul class="case-points">
+        <li>设备台账：设备信息列表、新增 / 编辑、状态管理</li>
+        <li>预约审批流：学生提交预约申请，管理员审批，全程状态可追踪</li>
+        <li>使用统计：使用记录留痕，按设备 / 时段统计利用率</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lab-dash.png" width="1280" height="797" alt="系统工作台" loading="lazy"></div>
+          <figcaption>系统工作台</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lab-devices.png" width="1280" height="1093" alt="设备信息台账" loading="lazy"></div>
+          <figcaption>设备信息台账</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lab-apply.png" width="1280" height="579" alt="预约申请" loading="lazy"></div>
+          <figcaption>预约申请</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lab-approve.png" width="1280" height="779" alt="预约审批" loading="lazy"></div>
+          <figcaption>预约审批</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lab-stats.png" width="1280" height="924" alt="使用统计" loading="lazy"></div>
+          <figcaption>使用统计</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">审批流</span><span class="tag">状态机</span><span class="tag">实训报告交付</span><span class="tag">演示视频</span>
+      </div>
+    </div>
+    <!-- 案例L：垃圾短信文本分类：传统 vs 深度路线对比 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 L</span>垃圾短信文本分类：传统 vs 深度路线对比</div>
+        <div class="case-kind">机器学习 × 文本分类</div>
+      </div>
+      <div class="case-desc">
+        在<b>同一批语料、同一套划分与随机种子</b>下，把 TF-IDF + 朴素贝叶斯 / SVM 与 TextCNN / BERT 两条路线
+        做受控对比——不只比准确率，还比训练开销、单条预测耗时与误杀控制。
+      </div>
+      <ul class="case-points">
+        <li>语料：SMS Spam Collection 5574 条（13.4% 垃圾），训练 / 验证 / 测试按 7:1.5:1.5 固定划分</li>
+        <li>指标：准确率 / 精确率 / 召回率 / F1 / 混淆矩阵全量输出，精确率优先以压住误杀</li>
+        <li>工程视角：训练时长与单条预测耗时一并记录，作为平台选型依据</li>
+        <li>处置设计：概率阈值 + 低置信度转人工复核队列，不直接拦</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/spam-result.png" width="1280" height="625" alt="多模型测试集指标对比" loading="lazy"></div>
+          <figcaption>多模型测试集指标对比</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/spam-roc.png" width="1120" height="920" alt="ROC 曲线与阈值分析" loading="lazy"></div>
+          <figcaption>ROC 曲线与阈值分析</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/spam-deep.png" width="1280" height="746" alt="深度路线评估结果" loading="lazy"></div>
+          <figcaption>深度路线评估结果</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">TF-IDF</span><span class="tag">朴素贝叶斯 / SVM</span><span class="tag">TextCNN / BERT</span><span class="tag">受控对比实验</span>
+      </div>
+    </div>
+    <!-- 案例M：LSTM 时间序列预测：太阳黑子 277 年序列 -->
+    <div class="case">
+      <div class="case-head">
+        <div class="case-title"><span class="cnum">案例 M</span>LSTM 时间序列预测：太阳黑子 277 年序列</div>
+        <div class="case-kind">深度学习 × 时间序列</div>
+      </div>
+      <div class="case-desc">
+        用 SILSO 官方太阳黑子月均值序列（1749-2026，<b>3333 个月观测</b>）构建 LSTM 单步预测，
+        重点放在<b>规范的实验流程</b>：按时间顺序划分、归一化、滑动窗口构样本、早停防过拟合、双基线对照。
+      </div>
+      <ul class="case-points">
+        <li>数据：SILSO 官方 SN_m_tot_V2.0 月均序列，缺失检查 + 自相关分析，按时间顺序（非随机）划分数据集</li>
+        <li>模型：两层 LSTM + 全连接层，MSE 损失 + Adam，Early Stopping 控制过拟合</li>
+        <li>实验：网络容量与学习率的超参数对照，与持续性、线性外推两个基线比较 MSE / RMSE / MAE</li>
+        <li>评估：测试集量化评估、预测可视化、残差分档统计、未来活动周递推外推</li>
+      </ul>
+      <div class="case-shots">
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lstm-loss.png" width="900" height="540" alt="训练 / 验证损失收敛曲线" loading="lazy"></div>
+          <figcaption>训练 / 验证损失收敛曲线</figcaption>
+        </figure>
+        <figure>
+          <div class="frame"><img src="http://124.220.191.183:8000/shots/lstm-pred.png" width="1280" height="409" alt="测试集预测 vs 真实值" loading="lazy"></div>
+          <figcaption>测试集预测 vs 真实值</figcaption>
+        </figure>
+      </div>
+      <div class="tags">
+        <span class="tag">PyTorch</span><span class="tag">LSTM</span><span class="tag">滑动窗口</span><span class="tag">Early Stopping</span><span class="tag">基线对照</span>
+      </div>
+    </div>
+
+<!-- ===== 方法论 ===== -->
+<section id="method" class="alt">
+  <div class="container">
+    <div class="sec-label">HOW I WORK</div>
+    <h2 class="sec-title">AI Agent 协作开发方法论</h2>
+    <p class="sec-desc">
+      我的核心工作方式：把 AI Agent 当作真正的开发协作者——定义问题、拆解任务、验收产出、反馈缺陷。
+      这正是 AI Agent 应用岗位的日常：怎么给 Agent 派活、怎么判断它做得对、出了问题怎么带着它改。
+    </p>
+
+    <div class="loop-grid">
+      <div class="loop-card">
+        <span class="step-no">STEP 1</span>
+        <h3>需求拆解</h3>
+        <p>把模糊需求翻译成 Agent 可执行的小任务，每个任务有明确边界与验收标准。</p>
+      </div>
+      <div class="loop-card">
+        <span class="step-no">STEP 2</span>
+        <h3>任务派发</h3>
+        <p>按任务边界下达指令，控制单轮改动范围，避免一次改太多导致问题难定位。</p>
+      </div>
+      <div class="loop-card">
+        <span class="step-no">STEP 3</span>
+        <h3>功能验收</h3>
+        <p>用真实数据逐项验证，写测试用例核对功能点，不靠「看起来能跑」下结论。</p>
+      </div>
+      <div class="loop-card">
+        <span class="step-no">STEP 4</span>
+        <h3>缺陷反馈迭代</h3>
+        <p>定位问题根因后精确反馈，驱动下一轮迭代，直到全部验收通过才收尾。</p>
+      </div>
+    </div>
+
+    <div class="method-data">
+      <div class="md-item"><div class="n">200+</div><div class="t">近一个月 AI 协作开发会话</div></div>
+      <div class="md-item"><div class="n">10+ 轮</div><div class="t">个人工作台迭代闭环</div></div>
+      <div class="md-item"><div class="n">40+ 项</div><div class="t">定制项目按期交付</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 技能 ===== -->
+<section id="skills">
+  <div class="container">
+    <div class="sec-label">SKILLS</div>
+    <h2 class="sec-title">技能图谱</h2>
+    <p class="sec-desc">以「能落地」为标准：每一项技能都有对应的项目或交付实践作支撑。</p>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <h3><span>🧠</span>大模型应用</h3>
+        <p>Prompt Engineering、Function Calling 与工具开发流程；RAG 检索两种方案均有落地（BM25 轻量方案 + 向量库方案）；多模态图片理解；了解 LangBot 框架。</p>
+      </div>
+      <div class="skill-card">
+        <h3><span>🤝</span>AI 协作开发</h3>
+        <p>把需求讲清楚、拆成小任务、验收每一轮结果、发现缺陷精确反馈再迭代——30+ 个项目沉淀出的工作流。</p>
+      </div>
+      <div class="skill-card">
+        <h3><span>☁️</span>部署运维</h3>
+        <p>Linux 常用操作、宝塔面板配置、Docker 服务部署、Web 应用公网发布；个人工作台已实际部署在腾讯云持续运行。</p>
+      </div>
+      <div class="skill-card">
+        <h3><span>💻</span>开发基础</h3>
+        <p>Python（接口调用、函数封装、异常处理）；SpringBoot / Vue3 / MySQL 基础全栈；Git、Postman、JUnit 单元测试。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 教育 ===== -->
+<section id="edu" class="alt">
+  <div class="container">
+    <div class="sec-label">EDUCATION</div>
+    <h2 class="sec-title">教育背景</h2>
+    <div class="edu-card">
+      <div>
+        <div class="school">武昌理工学院 · 计算机科学与技术（本科）</div>
+        <div class="major">核心课程：数据结构与算法 · 数据库原理 · 计算机网络 · 操作系统 · JavaWeb 开发 · Python 程序设计</div>
+      </div>
+      <div class="date">2023.09 - 2027.06</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 页脚 ===== -->
+<footer>
+  <div class="container">
+    <div class="cta">期待以 AI Agent 应用开发实习生的身份加入你的团队 🚀</div>
+    <div class="contact">
+      <b>电话：</b>187-7171-8390 &nbsp;&nbsp; <b>邮箱：</b>2827110018@qq.com &nbsp;&nbsp; <b>坐标：</b>湖北武汉<br>
+      个人工作台 App 就在我的手机上——面试时可现场打开演示。
+    </div>
+    <div class="fine">本页面为个人求职作品集，所列项目与数据均真实可验证——四个项目在本人的腾讯云服务器上持续运行，任何一项都可以现场演示或提供访问凭证。定制交付项目因客户委托约定仅展示运行效果与技术方案。<br>最近更新：2026 年 11 月 · 本页另有 WorkBuddy 资料库镜像：<a href="https://workbuddy.link/p/FqkRLEI9N7oDZDmjPZLuVN" target="_blank" rel="noopener" style="color:#9ca3af;">workbuddy.link/p/FqkRLEI9N7oDZDmjPZLuVN</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var lb = document.createElement('div');
+  lb.id = 'lb';
+  lb.innerHTML = '<div class="lb-box"><div class="lb-bar"><span class="t" id="lb_t"></span><button id="lb_x">关闭 ✕</button></div><div class="lb-body" id="lb_body"><img id="lb_img" alt="完整截图" loading="lazy"></div></div>';
+  document.body.appendChild(lb);
+  var body = document.getElementById('lb_body');
+  var img = document.getElementById('lb_img');
+  var zoom = 1;
+  function setZoom(z){
+    zoom = Math.min(3.2, Math.max(1, z));
+    if (zoom <= 1.01){
+      img.classList.remove('zoomed');
+      img.style.width = '';
+      img.style.cursor = 'zoom-in';
+    } else {
+      img.classList.add('zoomed');
+      img.style.width = (zoom * 100) + '%';
+      img.style.cursor = 'zoom-out';
+    }
+    body.scrollTop = 0; body.scrollLeft = 0;
+  }
+  function closeLb(){ lb.style.display = 'none'; img.src = ''; setZoom(1); }
+  lb.addEventListener('click', function(e){ if(e.target === lb || e.target.id === 'lb_x'){ closeLb(); } });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeLb(); } });
+  img.addEventListener('click', function(e){
+    e.stopPropagation();
+    setZoom(zoom > 1.01 ? 1 : 2);
+  });
+  body.addEventListener('wheel', function(e){
+    if (lb.style.display !== 'flex') return;
+    e.preventDefault();
+    setZoom(zoom + (e.deltaY < 0 ? 0.25 : -0.25));
+  });
+  function openLb(src, title){
+    document.getElementById('lb_t').textContent = title || '';
+    img.src = src;
+    lb.style.display = 'flex';
+    setZoom(1);
+  }
+  var cards = document.querySelectorAll('[data-full]');
+  for(var i = 0; i < cards.length; i++){
+    cards[i].addEventListener('click', function(){
+      openLb(this.getAttribute('data-full'), this.getAttribute('data-title'));
+    });
+  }
+  /* 其余静态截图：点击同样可放大 */
+  var staticImgs = document.querySelectorAll('.case-shots .frame img, .phone-shots .phone-shot img');
+  for(var k = 0; k < staticImgs.length; k++){
+    staticImgs[k].addEventListener('click', function(e){
+      if (this.closest && this.closest('[data-full]')) { return; }
+      e.stopPropagation();
+      var fig = this.closest ? this.closest('figure') : null;
+      var cap = fig && fig.querySelector('figcaption') ? fig.querySelector('figcaption').textContent : '';
+      openLb(this.src, cap || (this.alt || ''));
+    });
+  }
+})();
+</script>
+
+<button id="toTop" aria-label="回到顶部" title="回到顶部">↑</button>
+
+<script>
+(function(){
+  /* 回到顶部 */
+  var tt = document.getElementById('toTop');
+  var onScroll = function(){
+    if (window.pageYOffset > 600) { tt.classList.add('on'); } else { tt.classList.remove('on'); }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  tt.addEventListener('click', function(){
+    if (window.scrollTo) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else { window.scrollTo(0, 0); }
+  });
+
+  /* 图片加载失败兜底：图床异常时不出现破图，改为文字说明 */
+  var imgs = document.querySelectorAll('img');
+  for (var i = 0; i < imgs.length; i++){
+    imgs[i].addEventListener('error', function(){
+      if (this.getAttribute('data-failed')) { return; }
+      this.setAttribute('data-failed', '1');
+      var ph = document.createElement('div');
+      ph.className = 'img-fail';
+      ph.textContent = (this.getAttribute('alt') || '运行截图') + '（图片暂时加载失败，稍后刷新即可）';
+      if (this.parentNode) { this.parentNode.insertBefore(ph, this); }
+      this.style.display = 'none';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
