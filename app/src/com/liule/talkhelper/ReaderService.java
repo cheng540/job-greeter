@@ -260,7 +260,7 @@ public class ReaderService extends AccessibilityService {
                     }, 1300);
                     return;
                 }
-                toast("连读三次内容没变（已收录 " + lastRaw.split("\n").length + " 行）。滚到位后停两秒再点球；若一直如此说明这机型的网页内容读不到");
+                toast("这屏没有新增内容（已收录 " + lastRaw.split("\n").length + " 行，第 1 屏可能已经读全了）。可以直接点「开始生成」");
                 setAppendMode(true);
                 return;
             }
@@ -474,7 +474,7 @@ public class ReaderService extends AccessibilityService {
     }
 
     private void walk(AccessibilityNodeInfo n, Set<String> out, int depth) {
-        if (n == null || depth > 60 || out.size() > 600) return;
+        if (n == null || depth > 60 || out.size() > 1500) return;
         CharSequence t = n.getText();
         if (t != null) addClean(out, t.toString());
         CharSequence d = n.getContentDescription();
@@ -489,9 +489,26 @@ public class ReaderService extends AccessibilityService {
     private void addClean(Set<String> out, String s) {
         String v = s.trim();
         if (v.length() < 2) return;
-        if (v.length() > 400) v = v.substring(0, 400);
         for (String skip : SKIP) if (skip.equals(v)) return;
-        out.add(v);
+        // BOSS 的 JD 是超长大文本块：截断会丢内容且滚动后节点不变导致永远读不到新内容。
+        // 改为按句切分，一段长文本拆成多行，全部收录
+        if (v.length() > 380) {
+            String[] parts = v.split("(?<=[\u4e00-\u9fff\uff1b\u3002\uff01\uff1f;!?])");
+            StringBuilder cur = new StringBuilder();
+            for (String part : parts) {
+                if (cur.length() + part.length() > 380 && cur.length() > 0) {
+                    out.add(cur.toString().trim());
+                    cur.setLength(0);
+                }
+                cur.append(part);
+            }
+            if (cur.length() > 0) {
+                String tail = cur.toString().trim();
+                if (tail.length() >= 2) out.add(tail);
+            }
+        } else {
+            out.add(v);
+        }
     }
 
     /* ================= 面板 ================= */
