@@ -13,6 +13,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -52,6 +53,7 @@ public class ReaderService extends AccessibilityService {
     private String lastText = "";
     private boolean busy = false;
     private boolean appendMode = false;
+    private long lastTreeChange = 0L;   // 最近一次页面内容变化时间
     private int screens = 1;
 
     private String shownMeta = "";
@@ -75,7 +77,15 @@ public class ReaderService extends AccessibilityService {
     }
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) { }
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        int t = event.getEventType();
+        if (t == AccessibilityEvent.TYPE_VIEW_SCROLLED
+                || t == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+            CharSequence pkg = event.getPackageName();
+            if (pkg != null && pkg.toString().equals(getPackageName())) return;   // 忽略自己
+            lastTreeChange = SystemClock.uptimeMillis();
+        }
+    }
 
     @Override
     public void onInterrupt() { }
@@ -217,6 +227,20 @@ public class ReaderService extends AccessibilityService {
     }
 
     private void doTrigger(final boolean appending) {
+        doTrigger2(appending, 0);
+    }
+
+    private void doTrigger2(final boolean appending, final int attempt) {
+        // 滚动后 BOSS 网页内核把新内容同步进无障碍节点树要 1 秒上下，等它稳定再读
+        if (appending && attempt == 0) {
+            long since = SystemClock.uptimeMillis() - lastTreeChange;
+            if (since < 900) {
+                ui.postDelayed(new Runnable() {
+                    @Override public void run() { doTrigger2(appending, 0); }
+                }, 900 - since);
+                return;
+            }
+        }
         try {
         String raw = readScreen();
         boolean thin = raw.replaceAll("\\s", "").length() < 15;
@@ -229,8 +253,14 @@ public class ReaderService extends AccessibilityService {
             }
             int fresh = countNewLines(raw, lastRaw);
             if (fresh < 3) {
-                // 读回来的内容几乎都在上一屏里 → 页面没滚动到位或又读到了旧缓存
-                toast("这一屏和前面基本一样（新增 " + fresh + " 行）。多滚一段距离，停顿半秒再点球");
+                if (attempt < 2) {
+                    toast(attempt == 0 ? "页面内容还没同步，稍等自动重读…" : "还没读到新内容，再等一下重读…");
+                    ui.postDelayed(new Runnable() {
+                        @Override public void run() { doTrigger2(appending, attempt + 1); }
+                    }, 1300);
+                    return;
+                }
+                toast("连读三次内容没变（已收录 " + lastRaw.split("\n").length + " 行）。滚到位后停两秒再点球；若一直如此说明这机型的网页内容读不到");
                 setAppendMode(true);
                 return;
             }
