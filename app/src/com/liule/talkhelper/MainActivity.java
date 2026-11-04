@@ -41,8 +41,7 @@ public class MainActivity extends Activity {
 
     private TextView statusView, btnOpen, headTitle;
     private EditText urlEdit, modelEdit, keyEdit, wordEdit, resumeEdit;
-    private EditText recruitEdit, cityEdit, salaryEdit, thresholdEdit, limitEdit;
-    private CheckBox cbSend, cbLink;
+    private EditText recruitEdit, cityEdit, salaryEdit;
     private Cfg cfg;
 
     private final List<View> builtPages = new ArrayList<View>();
@@ -265,7 +264,7 @@ public class MainActivity extends Activity {
 
         TextView mDesc = new TextView(this);
         mDesc.setText("停在岗位详情页，点屏幕上的蓝色悬浮球「话」，它读当前这一屏 → 打分 → 生成话术。"
-                + "分数够线会按你的设置自动发，不够就只记进浏览记录。");
+                + "生成的话术自动复制，发送由你自己粘贴完成。");
         mDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         mDesc.setTextColor(Color.parseColor("#4B5563"));
         mDesc.setLineSpacing(dp(4), 1f);
@@ -455,53 +454,9 @@ public class MainActivity extends Activity {
 
         LinearLayout autoCard = card();
         root.addView(autoCard);
-        autoCard.addView(label("自动打招呼"));
+        autoCard.addView(label("浏览记录"));
 
-        cbSend = new CheckBox(this);
-        cbSend.setText("达到分数线就自动发送");
-        cbSend.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
-        cbSend.setChecked(cfg.autoSend);
-        autoCard.addView(cbSend);
-
-        LinearLayout numRow = new LinearLayout(this);
-        numRow.setOrientation(LinearLayout.HORIZONTAL);
-        autoCard.addView(numRow);
-
-        thresholdEdit = numInput(cfg.threshold);
-        limitEdit = numInput(cfg.dailyLimit);
-
-        LinearLayout tWrap = new LinearLayout(this);
-        tWrap.setOrientation(LinearLayout.VERTICAL);
-        tWrap.addView(smallLabel("分数线（0-100）"));
-        tWrap.addView(thresholdEdit);
-
-        LinearLayout lWrap = new LinearLayout(this);
-        lWrap.setOrientation(LinearLayout.VERTICAL);
-        lWrap.addView(smallLabel("每天最多发几条"));
-        lWrap.addView(limitEdit);
-
-        LinearLayout.LayoutParams n1 = new LinearLayout.LayoutParams(0,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        LinearLayout.LayoutParams n2 = new LinearLayout.LayoutParams(0,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        n2.leftMargin = dp(10);
-        numRow.addView(tWrap, n1);
-        numRow.addView(lWrap, n2);
-
-        cbLink = new CheckBox(this);
-        cbLink.setText("自动抓岗位链接（会闪一下分享面板）");
-        cbLink.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
-        cbLink.setPadding(0, dp(8), 0, 0);
-        cbLink.setChecked(cfg.autoLink);
-        autoCard.addView(cbLink);
-
-        TextView aTip2 = new TextView(this);
-        aTip2.setText("低于分数线的岗位只记进浏览记录，不会发送。");
-        aTip2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
-        aTip2.setTextColor(Color.parseColor("#9CA3AF"));
-        aTip2.setLineSpacing(dp(3), 1f);
-        aTip2.setPadding(0, dp(8), 0, 0);
-        autoCard.addView(aTip2);
+        TextView histBtn = primaryBtn("查看浏览记录");
 
         TextView saveBtn = primaryBtn("保存配置");
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -536,7 +491,7 @@ public class MainActivity extends Activity {
         c1.addView(step("1", "打开招聘 App，进到岗位详情页"));
         c1.addView(step("2", "点屏幕上的蓝色悬浮球「话」"));
         c1.addView(step("3", "等几秒，自动打分并生成开场白"));
-        c1.addView(step("4", "够分数线就自动发，不够就只记进浏览记录"));
+        c1.addView(step("4", "点「复制到剪贴板」，回聊天框长按粘贴发送"));
 
         LinearLayout c2 = card();
         root.addView(c2);
@@ -557,8 +512,7 @@ public class MainActivity extends Activity {
                 "说明没调用到大模型，用的是 App 自带的模板。去配置页检查接口地址、模型名、Key，点「测试接口连通性」看报什么错。"));
         c3.addView(faq("球突然不见了？",
                 "系统把后台清了。回首页把「后台保活」三项都点一遍，再去任务列表长按卡片锁定。"));
-        c3.addView(faq("自动发送没成功？",
-                "话术会自动复制到剪贴板，长按输入框粘一下就行。反复失败把当时屏幕截图反馈。"));
+        
         c3.addView(faq("记录里没有链接？",
                 "分享面板里没找到「复制链接」，或者你关了「自动抓岗位链接」。记录照样存，只是点不开岗位。"));
         c3.addView(faq("数据会上传吗？",
@@ -765,21 +719,6 @@ public class MainActivity extends Activity {
         cfg.recruit = recruitEdit.getText().toString().trim();
         cfg.city = cityEdit.getText().toString().trim();
         cfg.salary = salaryEdit.getText().toString().trim();
-        cfg.autoSend = cbSend.isChecked();
-        cfg.autoLink = cbLink.isChecked();
-
-        try { cfg.threshold = Integer.parseInt(thresholdEdit.getText().toString().trim()); }
-        catch (Exception e) { cfg.threshold = 85; }
-        if (cfg.threshold < 0) cfg.threshold = 0;
-        if (cfg.threshold > 100) cfg.threshold = 100;
-        thresholdEdit.setText(String.valueOf(cfg.threshold));
-
-        try { cfg.dailyLimit = Integer.parseInt(limitEdit.getText().toString().trim()); }
-        catch (Exception e) { cfg.dailyLimit = 5; }
-        if (cfg.dailyLimit < 0) cfg.dailyLimit = 0;
-        if (cfg.dailyLimit > 50) cfg.dailyLimit = 50;
-        limitEdit.setText(String.valueOf(cfg.dailyLimit));
-
         cfg.save(this);
         toast("已保存");
     }

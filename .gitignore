@@ -2,6 +2,7 @@
 app/build/
 build/
 *.apk
+*.apk.idsig
 !打招呼助手.apk
 
 # 签名（自己生成，不要提交）
@@ -28,3 +29,4 @@ talk.apk
 talk.html.bak*
 resume_extract.txt
 preview-*.png
+*.apk.idsig

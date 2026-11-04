@@ -304,20 +304,14 @@ public class ReaderService extends AccessibilityService {
                 rec.sent = false;
 
                 Db db = new Db(ReaderService.this);
-                long rid = -1;
                 if (!db.existsSame(rec.company, rec.title, 90000)) {
-                    rid = db.add(rec);
+                    db.add(rec);
                 }
-
-                boolean doSend = usedLlm && cfg.autoSend && score >= cfg.threshold
-                        && db.countSentToday() < cfg.dailyLimit;
 
                 final String text = out;
                 final int fScore = score;
                 final String fReason = reason;
                 final boolean fUsed = usedLlm;
-                final long fRid = rid;
-                final boolean fSend = doSend;
                 final boolean fConfigured = configured;
 
                 ui.post(new Runnable() {
@@ -326,39 +320,18 @@ public class ReaderService extends AccessibilityService {
                         busy = false;
                         lastText = text;
                         copy(text);
-                        if (fSend) {
-                            hidePanel();
-                            toast("适配度 " + fScore + "%，自动发送中…");
-                        } else {
-                            setBody(text);
-                            String sc = screens > 1 ? " · 已读 " + screens + " 屏" : "";
-                            String wt = Cfg.load(ReaderService.this).words > 0
-                                    ? " · 目标 " + Cfg.load(ReaderService.this).words : "";
-                            setMeta((fUsed ? "AI 生成 · " + text.length() + " 字" + wt
-                                    : "内置模板 · " + text.length() + " 字") + sc);
-                            setScore(fUsed ? fScore : -1, fReason);
-                            panelAction.setEnabled(true);
-                            panelAction.setAlpha(1f);
-                            if (!fConfigured) toast("还没配 API，去 App 里填好地址/模型/Key");
-                        }
+                        setBody(text);
+                        String sc = screens > 1 ? " · 已读 " + screens + " 屏" : "";
+                        String wt = Cfg.load(ReaderService.this).words > 0
+                                ? " · 目标 " + Cfg.load(ReaderService.this).words : "";
+                        setMeta((fUsed ? "AI 生成 · " + text.length() + " 字" + wt
+                                : "内置模板 · " + text.length() + " 字") + sc);
+                        setScore(fUsed ? fScore : -1, fReason);
+                        panelAction.setEnabled(true);
+                        panelAction.setAlpha(1f);
+                        if (!fConfigured) toast("还没配 API，去 App 里填好地址/模型/Key");
                     }
                 });
-
-                if (fSend) {
-                    sleep(500);
-                    final boolean ok = autoSend(text);
-                    ui.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (ok) {
-                                if (fRid > 0) new Db(ReaderService.this).markSent(fRid);
-                                toast("已自动发送（" + fScore + " 分）");
-                            } else {
-                                toast("自动发送没成功，话术已复制，手动粘一下");
-                            }
-                        }
-                    });
-                }
             }
         }).start();
     }
@@ -456,44 +429,6 @@ public class ReaderService extends AccessibilityService {
         return false;
     }
 
-    /** 自动打招呼：点「立即沟通」→ 找输入框 → 填话术 → 点发送 */
-    private boolean autoSend(String talk) {
-        if (!clickLabel(new String[]{"立即沟通", "打招呼", "继续沟通"},
-                new String[]{"立即沟通", "打招呼"})) {
-            return false;
-        }
-        sleep(1600);
-
-        AccessibilityNodeInfo root = getRootInActiveWindow();
-        if (root == null) return false;
-        List<AccessibilityNodeInfo> eds = new ArrayList<AccessibilityNodeInfo>();
-        findEditable(root, eds, 0);
-        if (eds.isEmpty()) {
-            sleep(1400);
-            root = getRootInActiveWindow();
-            if (root == null) return false;
-            findEditable(root, eds, 0);
-            if (eds.isEmpty()) return false;
-        }
-        AccessibilityNodeInfo ed = eds.get(0);
-        for (AccessibilityNodeInfo n : eds) {
-            if (n.isFocused()) {
-                ed = n;
-                break;
-            }
-        }
-        ed.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
-        Bundle b = new Bundle();
-        b.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, talk);
-        boolean set = ed.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, b);
-        if (!set) {
-            set = ed.performAction(AccessibilityNodeInfo.ACTION_PASTE);
-        }
-        if (!set) return false;
-
-        sleep(800);
-        return clickLabel(new String[]{"发送"}, new String[]{"发送"});
-    }
 
     private String shortMsg(String s) {
         if (s == null) return "";
