@@ -53,6 +53,10 @@ public class ReaderService extends AccessibilityService {
     private boolean appendMode = false;
     private int screens = 1;
 
+    private String shownMeta = "";
+    private int shownScore = -1;
+    private String shownReason = "";
+
     private static final int MODE_COLLECT = 0;
     private static final int MODE_RESULT = 1;
     private int panelMode = MODE_COLLECT;
@@ -323,15 +327,13 @@ public class ReaderService extends AccessibilityService {
                         lastText = text;
                         copy(text);
                         panelMode = MODE_RESULT;
-                        setBody(text);
                         String sc = screens > 1 ? " · 已读 " + screens + " 屏" : "";
-                        String wt = Cfg.load(ReaderService.this).words > 0
-                                ? " · 目标 " + Cfg.load(ReaderService.this).words : "";
-                        setMeta((fUsed ? "AI 生成 · " + text.length() + " 字" + wt
-                                : "内置模板 · " + text.length() + " 字") + sc);
-                        setScore(fUsed ? fScore : -1, fReason);
-                        panelAction.setEnabled(true);
-                        panelAction.setAlpha(1f);
+                        String wt = cfg.words > 0 ? " · 目标 " + cfg.words : "";
+                        shownMeta = (fUsed ? "AI 生成 · " + text.length() + " 字" + wt
+                                : "内置模板 · " + text.length() + " 字") + sc;
+                        shownScore = fUsed ? fScore : -1;
+                        shownReason = fReason;
+                        showPanel();
                         if (!fConfigured) toast("还没配 API，去 App 里填好地址/模型/Key");
                     }
                 });
@@ -534,6 +536,9 @@ public class ReaderService extends AccessibilityService {
                 }
             });
         }
+
+        setMeta(collect ? "攒够几屏了点「开始生成」，中途不消耗模型额度" : shownMeta);
+        setScore(collect ? -1 : shownScore, collect ? "" : shownReason);
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 getResources().getDisplayMetrics().widthPixels - dp(32), dp(430),
