@@ -400,8 +400,8 @@ public class ReaderService extends AccessibilityService {
     /* ================= 面板 ================= */
 
     private void showPanel() {
+        boolean collect = (panelMode == MODE_COLLECT);   // 必须在 hidePanel 之前取，hidePanel 不再改写模式
         hidePanel();
-        boolean collect = (panelMode == MODE_COLLECT);
 
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
@@ -626,7 +626,6 @@ public class ReaderService extends AccessibilityService {
             panelAction = null;
             panelScore = null;
             panelReason = null;
-            panelMode = MODE_COLLECT;
         }
     }
 
