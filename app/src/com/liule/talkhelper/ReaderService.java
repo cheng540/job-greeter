@@ -216,7 +216,8 @@ public class ReaderService extends AccessibilityService {
         }, delay);
     }
 
-    private void doTrigger(boolean appending) {
+    private void doTrigger(final boolean appending) {
+        try {
         String raw = readScreen();
         boolean thin = raw.replaceAll("\\s", "").length() < 15;
 
@@ -246,6 +247,11 @@ public class ReaderService extends AccessibilityService {
         }
         panelMode = MODE_COLLECT;
         showPanel();
+        } catch (final Throwable t) {
+            // 读屏任何异常都给出可见反馈，绝不静默
+            toast("读取出错：" + String.valueOf(t));
+            if (appending) setAppendMode(true);
+        }
     }
 
     /** 规范化：去掉所有空白，用于模糊去重 */
@@ -817,8 +823,32 @@ public class ReaderService extends AccessibilityService {
         }
     }
 
+    /** 小米/澎湃会屏蔽后台服务的系统 Toast，改用与悬浮球同类型的无障碍悬浮条，系统拦不住 */
     private void toast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+        try {
+            final TextView tv = new TextView(this);
+            tv.setText(s);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            tv.setTextColor(Color.WHITE);
+            tv.setBackground(round(Color.parseColor("#D9111827"), 12));
+            tv.setPadding(dp(16), dp(9), dp(16), dp(9));
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+            lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+            lp.y = dp(150);
+            wm.addView(tv, lp);
+            tv.postDelayed(new Runnable() {
+                @Override public void run() {
+                    try { wm.removeView(tv); } catch (Exception ignored) { }
+                }
+            }, 2400);
+        } catch (Exception e) {
+            Toast.makeText(this, s, Toast.LENGTH_SHORT).show();   // 悬浮条失败再退回系统 Toast
+        }
     }
 
     private String shortMsg(String s) {
