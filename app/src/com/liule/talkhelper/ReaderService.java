@@ -7,8 +7,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -33,18 +31,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 核心服务：悬浮球 + 读屏 + 打分生成 + 记录。
+ * 流程为「先攒后生成」：点球只采集当前屏，攒几屏由用户决定，点「开始生成」才调模型。
+ */
 public class ReaderService extends AccessibilityService {
 
     private WindowManager wm;
     private View ball;
     private WindowManager.LayoutParams ballLp;
     private View panel;
-    private TextView panelMeta, panelBody, panelAction;
-    private TextView panelScore, panelReason;
+    private TextView panelMeta, panelBody, panelAction, panelScore, panelReason;
     private ScrollView panelScroll;
 
     private final Handler ui = new Handler(Looper.getMainLooper());
-
 
     private int seed = 0;
     private String lastRaw = "";
@@ -52,6 +52,10 @@ public class ReaderService extends AccessibilityService {
     private boolean busy = false;
     private boolean appendMode = false;
     private int screens = 1;
+
+    private static final int MODE_COLLECT = 0;
+    private static final int MODE_RESULT = 1;
+    private int panelMode = MODE_COLLECT;
 
     private static final String[] SKIP = {
             "返回", "分享", "收藏", "举报", "更多", "搜索", "首页", "消息", "我的",
@@ -65,14 +69,17 @@ public class ReaderService extends AccessibilityService {
         addBall();
     }
 
-    @Override public void onAccessibilityEvent(AccessibilityEvent event) { }
-    @Override public void onInterrupt() { }
+    @Override
+    public void onAccessibilityEvent(AccessibilityEvent event) { }
+
+    @Override
+    public void onInterrupt() { }
 
     @Override
     public boolean onUnbind(Intent intent) {
         removeBall();
         hidePanel();
-        return true;   // 返回 true，系统后续重新绑定时会回调 onRebind
+        return true;
     }
 
     @Override
@@ -96,11 +103,11 @@ public class ReaderService extends AccessibilityService {
     private GradientDrawable round(int color, int radiusDp) {
         GradientDrawable d = new GradientDrawable();
         d.setColor(color);
-        d.setCornerRadius(dp(radiusDp));
+        d.setCornerRadius(radiusDp >= 999 ? 999 : dp(radiusDp));
         return d;
     }
 
-    /* ---------------- 悬浮球 ---------------- */
+    /* ================= 悬浮球 ================= */
 
     private void addBall() {
         if (ball != null) return;
@@ -137,8 +144,10 @@ public class ReaderService extends AccessibilityService {
             public boolean onTouch(View v, MotionEvent e) {
                 switch (e.getActionMasked()) {
                     case MotionEvent.ACTION_DOWN:
-                        dx0 = e.getRawX(); dy0 = e.getRawY();
-                        x0 = ballLp.x; y0 = ballLp.y;
+                        dx0 = e.getRawX();
+                        dy0 = e.getRawY();
+                        x0 = ballLp.x;
+                        y0 = ballLp.y;
                         moved = false;
                         v.setAlpha(0.75f);
                         return true;
@@ -172,7 +181,23 @@ public class ReaderService extends AccessibilityService {
         }
     }
 
-    /* ---------------- 主流程 ---------------- */
+    /** 悬浮球状态：蓝色「话」= 开新采集；橙色「续」= 下一屏追加进当前采集 */
+    private void setAppendMode(boolean on) {
+        appendMode = on;
+        if (on) panelMode = MODE_COLLECT;
+        if (ball instanceof TextView) {
+            TextView tv = (TextView) ball;
+            GradientDrawable d = new GradientDrawable();
+            d.setShape(GradientDrawable.OVAL);
+            d.setColor(Color.parseColor(on ? "#EA580C" : "#2563EB"));
+            d.setStroke(dp(2), Color.parseColor(on ? "#FED7AA" : "#BFDBFE"));
+            tv.setBackground(d);
+            tv.setText(on ? "续" : "话");
+        }
+        if (on) toast("滚到下一屏再点球，攒好后点「开始生成」");
+    }
+
+    /* ================= 主流程：先攒后生成 ================= */
 
     private void trigger() {
         if (busy) return;
@@ -197,9 +222,8 @@ public class ReaderService extends AccessibilityService {
             lastRaw = raw;
             screens = 1;
         }
-        seed = 0;
+        panelMode = MODE_COLLECT;
         showPanel();
-        run();
     }
 
     /** 把新读到的一屏并进已有文本，重复行只保留一份 */
@@ -222,24 +246,11 @@ public class ReaderService extends AccessibilityService {
         return sb.toString();
     }
 
-    /** 切换悬浮球状态：普通=蓝色「话」，补充模式=橙色「续」 */
-    private void setAppendMode(boolean on) {
-        appendMode = on;
-        if (ball instanceof TextView) {
-            TextView tv = (TextView) ball;
-            GradientDrawable d = new GradientDrawable();
-            d.setShape(GradientDrawable.OVAL);
-            d.setColor(Color.parseColor(on ? "#EA580C" : "#2563EB"));
-            d.setStroke(dp(2), Color.parseColor(on ? "#FED7AA" : "#BFDBFE"));
-            tv.setBackground(d);
-            tv.setText(on ? "续" : "话");
-        }
-        if (on) toast("滚到下一屏，再点一次这个球");
-    }
-
-        private void run() {
+    private void startGenerate() {
+        if (busy) return;
         final Cfg cfg = Cfg.load(this);
         busy = true;
+        panelMode = MODE_RESULT;
         setBody("正在生成…");
         final boolean configured = cfg.ready();
         setMeta(configured ? "调用 " + cfg.model + " …" : "未配置 API，先用内置模板");
@@ -247,20 +258,11 @@ public class ReaderService extends AccessibilityService {
         panelAction.setEnabled(false);
         panelAction.setAlpha(0.6f);
 
-        final int mySeed = seed;
         final String jd = lastRaw;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String url = "";
-                if (cfg.autoLink) {
-                    try {
-                        url = grabLink();
-                    } catch (Exception ignored) {
-                    }
-                }
-
                 String out = null;
                 String reason = "";
                 int score = -1;
@@ -278,7 +280,7 @@ public class ReaderService extends AccessibilityService {
                 boolean usedLlm = configured && err == null && out != null && !out.trim().isEmpty();
                 if (out == null || out.trim().isEmpty()) {
                     TalkGen.Result r = TalkGen.parse(jd);
-                    out = TalkGen.build(r, r.type, mySeed, cfg.resume);
+                    out = TalkGen.build(r, r.type, seed, cfg.resume);
                     score = -1;
                     reason = "";
                     if (err != null) {
@@ -300,7 +302,7 @@ public class ReaderService extends AccessibilityService {
                 rec.score = usedLlm ? score : -1;
                 rec.reason = usedLlm ? reason : "";
                 rec.talk = out;
-                rec.url = url;
+                rec.url = "";
                 rec.sent = false;
 
                 Db db = new Db(ReaderService.this);
@@ -320,6 +322,7 @@ public class ReaderService extends AccessibilityService {
                         busy = false;
                         lastText = text;
                         copy(text);
+                        panelMode = MODE_RESULT;
                         setBody(text);
                         String sc = screens > 1 ? " · 已读 " + screens + " 屏" : "";
                         String wt = Cfg.load(ReaderService.this).words > 0
@@ -336,8 +339,281 @@ public class ReaderService extends AccessibilityService {
         }).start();
     }
 
+    /* ================= 读屏 ================= */
 
+    private String readScreen() {
+        Set<String> out = new LinkedHashSet<String>();
 
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root != null) walk(root, out, 0);
+
+        if (out.size() < 5) {
+            List<AccessibilityWindowInfo> wins = getWindows();
+            if (wins != null) {
+                for (AccessibilityWindowInfo w : wins) {
+                    AccessibilityNodeInfo r = w.getRoot();
+                    if (r != null) walk(r, out, 0);
+                }
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (String s : out) sb.append(s).append('\n');
+        return sb.toString();
+    }
+
+    private void walk(AccessibilityNodeInfo n, Set<String> out, int depth) {
+        if (n == null || depth > 60 || out.size() > 600) return;
+        CharSequence t = n.getText();
+        if (t != null) addClean(out, t.toString());
+        CharSequence d = n.getContentDescription();
+        if (d != null) addClean(out, d.toString());
+        int c = n.getChildCount();
+        for (int i = 0; i < c; i++) {
+            AccessibilityNodeInfo ch = n.getChild(i);
+            if (ch != null) walk(ch, out, depth + 1);
+        }
+    }
+
+    private void addClean(Set<String> out, String s) {
+        String v = s.trim();
+        if (v.length() < 2) return;
+        if (v.length() > 400) v = v.substring(0, 400);
+        for (String skip : SKIP) if (skip.equals(v)) return;
+        out.add(v);
+    }
+
+    /* ================= 面板 ================= */
+
+    private void showPanel() {
+        hidePanel();
+        boolean collect = (panelMode == MODE_COLLECT);
+
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setBackground(round(Color.WHITE, 16));
+        box.setPadding(dp(14), dp(12), dp(14), dp(12));
+        box.setElevation(dp(10));
+
+        LinearLayout titleRow = new LinearLayout(this);
+        titleRow.setOrientation(LinearLayout.HORIZONTAL);
+        titleRow.setGravity(Gravity.CENTER_VERTICAL);
+        box.addView(titleRow);
+
+        TextView title = new TextView(this);
+        title.setText(collect ? ("已读第 " + screens + " 屏") : "开场白");
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        title.setTextColor(Color.parseColor("#111827"));
+        title.setTypeface(null, Typeface.BOLD);
+        titleRow.addView(title);
+
+        panelScore = new TextView(this);
+        panelScore.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
+        panelScore.setTypeface(null, Typeface.BOLD);
+        panelScore.setGravity(Gravity.CENTER);
+        panelScore.setPadding(dp(9), dp(2), dp(9), dp(2));
+        panelScore.setVisibility(View.GONE);
+        LinearLayout.LayoutParams psLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        psLp.leftMargin = dp(10);
+        titleRow.addView(panelScore, psLp);
+
+        panelMeta = new TextView(this);
+        panelMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        panelMeta.setTextColor(Color.parseColor("#9CA3AF"));
+        panelMeta.setPadding(0, dp(3), 0, dp(6));
+        if (collect) {
+            panelMeta.setText("攒够几屏了点「开始生成」，中途不消耗模型额度");
+        }
+        box.addView(panelMeta);
+
+        panelReason = new TextView(this);
+        panelReason.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
+        panelReason.setTextColor(Color.parseColor("#94A3B8"));
+        panelReason.setLineSpacing(dp(2), 1f);
+        panelReason.setPadding(0, 0, 0, dp(8));
+        panelReason.setVisibility(View.GONE);
+        box.addView(panelReason);
+
+        panelBody = new TextView(this);
+        panelBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        panelBody.setTextColor(Color.parseColor("#1F2937"));
+        panelBody.setLineSpacing(dp(5), 1f);
+        panelBody.setTextIsSelectable(true);
+        panelBody.setText(collect ? lastRaw : lastText);
+
+        panelScroll = new ScrollView(this);
+        panelScroll.setBackground(round(Color.parseColor("#F8FAFC"), 10));
+        panelScroll.setPadding(dp(10), dp(8), dp(10), dp(8));
+        panelScroll.addView(panelBody);
+        box.addView(panelScroll, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+
+        panelAction = new TextView(this);
+        panelAction.setText(collect ? "开始生成" : "复制到剪贴板");
+        panelAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        panelAction.setTextColor(Color.WHITE);
+        panelAction.setGravity(Gravity.CENTER);
+        panelAction.setTypeface(null, Typeface.BOLD);
+        panelAction.setBackground(round(Color.parseColor(
+                collect ? "#16A34A" : "#2563EB"), 10));
+        panelAction.setPadding(0, dp(11), 0, dp(11));
+        LinearLayout.LayoutParams aLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        aLp.topMargin = dp(10);
+        box.addView(panelAction, aLp);
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams rLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        rLp.topMargin = dp(8);
+        box.addView(row, rLp);
+
+        if (collect) {
+            TextView more = smallBtn("补充下一屏", "#FFF7ED", "#C2410C");
+            more.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { setAppendMode(true); }
+            });
+            row.addView(more, weightLp());
+
+            TextView close = smallBtn("关闭", "#FFFFFF", "#9CA3AF");
+            close.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { hidePanel(); }
+            });
+            LinearLayout.LayoutParams clp = weightLp();
+            clp.leftMargin = dp(8);
+            row.addView(close, clp);
+
+            panelAction.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { startGenerate(); }
+            });
+        } else {
+            TextView again = smallBtn("重写", "#F1F5F9", "#334155");
+            again.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    if (busy || lastRaw.isEmpty()) return;
+                    seed++;
+                    startGenerate();
+                }
+            });
+            row.addView(again, weightLp());
+
+            TextView fill = smallBtn("填入输入框", "#EFF6FF", "#1D4ED8");
+            fill.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    if (lastText.isEmpty()) return;
+                    if (fillInput(lastText)) { hidePanel(); toast("已填入"); }
+                    else { copy(lastText); toast("这个输入框不支持直接填，已复制，长按粘贴"); }
+                }
+            });
+            LinearLayout.LayoutParams flp = weightLp();
+            flp.leftMargin = dp(8);
+            row.addView(fill, flp);
+
+            TextView more = smallBtn("补充下一屏", "#FFF7ED", "#C2410C");
+            more.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { setAppendMode(true); }
+            });
+            LinearLayout.LayoutParams mlp = weightLp();
+            mlp.leftMargin = dp(8);
+            row.addView(more, mlp);
+
+            TextView close = smallBtn("关闭", "#FFFFFF", "#9CA3AF");
+            close.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { hidePanel(); }
+            });
+            LinearLayout.LayoutParams clp = weightLp();
+            clp.leftMargin = dp(8);
+            row.addView(close, clp);
+
+            panelAction.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    copy(lastText);
+                    toast("已复制，回聊天框长按粘贴");
+                }
+            });
+        }
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                getResources().getDisplayMetrics().widthPixels - dp(32), dp(430),
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+        lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        lp.y = dp(80);
+
+        panel = box;
+        wm.addView(panel, lp);
+    }
+
+    private LinearLayout.LayoutParams weightLp() {
+        return new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+    }
+
+    private TextView smallBtn(String text, String bg, String fg) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        tv.setTextColor(Color.parseColor(fg));
+        tv.setGravity(Gravity.CENTER);
+        tv.setBackground(round(Color.parseColor(bg), 9));
+        tv.setPadding(0, dp(10), 0, dp(10));
+        return tv;
+    }
+
+    private void setBody(String s) {
+        if (panelBody != null) panelBody.setText(s);
+        if (panelScroll != null) {
+            panelScroll.post(new Runnable() {
+                @Override public void run() { panelScroll.scrollTo(0, 0); }
+            });
+        }
+    }
+
+    private void setMeta(String s) {
+        if (panelMeta != null) panelMeta.setText(s);
+    }
+
+    private void setScore(int score, String reason) {
+        if (panelScore == null) return;
+        if (score < 0) {
+            panelScore.setVisibility(View.GONE);
+        } else {
+            int fg, bg;
+            if (score >= 75) { fg = Color.parseColor("#15803D"); bg = Color.parseColor("#DCFCE7"); }
+            else if (score >= 50) { fg = Color.parseColor("#B45309"); bg = Color.parseColor("#FEF3C7"); }
+            else { fg = Color.parseColor("#B91C1C"); bg = Color.parseColor("#FEE2E2"); }
+            panelScore.setText("适配度 " + score + "%");
+            panelScore.setTextColor(fg);
+            panelScore.setBackground(round(bg, 999));
+            panelScore.setVisibility(View.VISIBLE);
+        }
+        if (panelReason != null) {
+            if (reason == null || reason.trim().isEmpty()) {
+                panelReason.setVisibility(View.GONE);
+            } else {
+                panelReason.setText(reason.trim());
+                panelReason.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void hidePanel() {
+        if (panel != null) {
+            try { wm.removeView(panel); } catch (Exception ignored) { }
+            panel = null;
+            panelScroll = null;
+            panelBody = null;
+            panelMeta = null;
+            panelAction = null;
+            panelScore = null;
+            panelReason = null;
+            panelMode = MODE_COLLECT;
+        }
+    }
+
+    /* ================= 抓链接 ================= */
 
     private void sleep(long ms) {
         try {
@@ -429,265 +705,7 @@ public class ReaderService extends AccessibilityService {
         return false;
     }
 
-
-    private String shortMsg(String s) {
-        if (s == null) return "";
-        return s.length() > 70 ? s.substring(0, 70) + "…" : s;
-    }
-
-    /* ---------------- 读屏 ---------------- */
-
-    private String readScreen() {
-        Set<String> out = new LinkedHashSet<String>();
-
-        AccessibilityNodeInfo root = getRootInActiveWindow();
-        if (root != null) walk(root, out, 0);
-
-        if (out.size() < 5) {
-            List<AccessibilityWindowInfo> wins = getWindows();
-            if (wins != null) {
-                for (AccessibilityWindowInfo w : wins) {
-                    AccessibilityNodeInfo r = w.getRoot();
-                    if (r != null) walk(r, out, 0);
-                }
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (String s : out) sb.append(s).append('\n');
-        return sb.toString();
-    }
-
-    private void walk(AccessibilityNodeInfo n, Set<String> out, int depth) {
-        if (n == null || depth > 60 || out.size() > 600) return;
-        CharSequence t = n.getText();
-        if (t != null) addClean(out, t.toString());
-        CharSequence d = n.getContentDescription();
-        if (d != null) addClean(out, d.toString());
-        int c = n.getChildCount();
-        for (int i = 0; i < c; i++) {
-            AccessibilityNodeInfo ch = n.getChild(i);
-            if (ch != null) walk(ch, out, depth + 1);
-        }
-    }
-
-    private void addClean(Set<String> out, String s) {
-        String v = s.trim();
-        if (v.length() < 2) return;
-        if (v.length() > 400) v = v.substring(0, 400);
-        for (String skip : SKIP) if (skip.equals(v)) return;
-        out.add(v);
-    }
-
-    /* ---------------- 面板 ---------------- */
-
-    private void showPanel() {
-        hidePanel();
-
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setBackground(round(Color.WHITE, 16));
-        box.setPadding(dp(14), dp(12), dp(14), dp(12));
-        box.setElevation(dp(10));
-
-        LinearLayout titleRow = new LinearLayout(this);
-        titleRow.setOrientation(LinearLayout.HORIZONTAL);
-        titleRow.setGravity(Gravity.CENTER_VERTICAL);
-        box.addView(titleRow);
-
-        TextView title = new TextView(this);
-        title.setText("开场白");
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        title.setTextColor(Color.parseColor("#111827"));
-        title.setTypeface(null, Typeface.BOLD);
-        titleRow.addView(title);
-
-        panelScore = new TextView(this);
-        panelScore.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
-        panelScore.setTypeface(null, Typeface.BOLD);
-        panelScore.setGravity(Gravity.CENTER);
-        panelScore.setPadding(dp(9), dp(2), dp(9), dp(2));
-        panelScore.setVisibility(View.GONE);
-        LinearLayout.LayoutParams psLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        psLp.leftMargin = dp(10);
-        titleRow.addView(panelScore, psLp);
-
-        panelMeta = new TextView(this);
-        panelMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        panelMeta.setTextColor(Color.parseColor("#9CA3AF"));
-        panelMeta.setPadding(0, dp(3), 0, dp(6));
-        box.addView(panelMeta);
-
-        panelReason = new TextView(this);
-        panelReason.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
-        panelReason.setTextColor(Color.parseColor("#94A3B8"));
-        panelReason.setLineSpacing(dp(2), 1f);
-        panelReason.setPadding(0, 0, 0, dp(8));
-        panelReason.setVisibility(View.GONE);
-        box.addView(panelReason);
-
-        panelBody = new TextView(this);
-        panelBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        panelBody.setTextColor(Color.parseColor("#1F2937"));
-        panelBody.setLineSpacing(dp(5), 1f);
-        panelBody.setTextIsSelectable(true);
-
-        ScrollView sv = new ScrollView(this);
-        sv.setBackground(round(Color.parseColor("#F8FAFC"), 10));
-        sv.setPadding(dp(10), dp(8), dp(10), dp(8));
-        sv.addView(panelBody);
-        box.addView(sv, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
-
-        panelAction = new TextView(this);
-        panelAction.setText("复制到剪贴板");
-        panelAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        panelAction.setTextColor(Color.WHITE);
-        panelAction.setGravity(Gravity.CENTER);
-        panelAction.setTypeface(null, Typeface.BOLD);
-        panelAction.setBackground(round(Color.parseColor("#2563EB"), 10));
-        panelAction.setPadding(0, dp(11), 0, dp(11));
-        LinearLayout.LayoutParams aLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        aLp.topMargin = dp(10);
-        box.addView(panelAction, aLp);
-
-        TextView more = smallBtn("补充下一屏", "#FFF7ED", "#C2410C");
-        more.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
-        more.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                if (busy) { toast("正在生成，稍等"); return; }
-                setAppendMode(true);
-                hidePanel();
-            }
-        });
-        LinearLayout.LayoutParams mLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        mLp.topMargin = dp(8);
-        box.addView(more, mLp);
-
-        panelAction.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                copy(lastText);
-                toast("已复制，回聊天框长按粘贴");
-            }
-        });
-
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams rLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        rLp.topMargin = dp(8);
-        box.addView(row, rLp);
-
-        TextView fill = smallBtn("填入输入框", "#EFF6FF", "#1D4ED8");
-        fill.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                if (lastText.isEmpty()) return;
-                if (fillInput(lastText)) { hidePanel(); toast("已填入"); }
-                else { copy(lastText); toast("这个输入框不支持直接填，已复制，长按粘贴"); }
-            }
-        });
-        row.addView(fill, weightLp());
-
-        TextView again = smallBtn("重写", "#F1F5F9", "#334155");
-        again.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                if (busy || lastRaw.isEmpty()) return;
-                seed++;
-                run();
-            }
-        });
-        LinearLayout.LayoutParams lp2 = weightLp();
-        lp2.leftMargin = dp(8);
-        row.addView(again, lp2);
-
-        TextView close = smallBtn("关闭", "#FFFFFF", "#9CA3AF");
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { hidePanel(); }
-        });
-        LinearLayout.LayoutParams lp3 = weightLp();
-        lp3.leftMargin = dp(8);
-        row.addView(close, lp3);
-
-        int screenW = getResources().getDisplayMetrics().widthPixels;
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
-                screenW - dp(32), dp(400),
-                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-        lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        lp.y = dp(90);
-
-        panelScroll = sv;
-        panel = box;
-        wm.addView(panel, lp);
-    }
-
-    private void setScore(int score, String reason) {
-        if (panelScore == null) return;
-        if (score < 0) {
-            panelScore.setVisibility(View.GONE);
-        } else {
-            int fg, bg;
-            if (score >= 75) { fg = Color.parseColor("#15803D"); bg = Color.parseColor("#DCFCE7"); }
-            else if (score >= 50) { fg = Color.parseColor("#B45309"); bg = Color.parseColor("#FEF3C7"); }
-            else { fg = Color.parseColor("#B91C1C"); bg = Color.parseColor("#FEE2E2"); }
-            panelScore.setText("适配度 " + score + "%");
-            panelScore.setTextColor(fg);
-            panelScore.setBackground(round(bg, 999));
-            panelScore.setVisibility(View.VISIBLE);
-        }
-        if (panelReason != null) {
-            if (reason == null || reason.trim().isEmpty()) {
-                panelReason.setVisibility(View.GONE);
-            } else {
-                panelReason.setText(reason.trim());
-                panelReason.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    private void setBody(String s) {
-        if (panelBody != null) panelBody.setText(s);
-        if (panelScroll != null) {
-            panelScroll.post(new Runnable() {
-                @Override public void run() { panelScroll.scrollTo(0, 0); }
-            });
-        }
-    }
-    private void setMeta(String s) { if (panelMeta != null) panelMeta.setText(s); }
-
-    private LinearLayout.LayoutParams weightLp() {
-        return new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-    }
-
-    private TextView smallBtn(String text, String bg, String fg) {
-        TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
-        tv.setTextColor(Color.parseColor(fg));
-        tv.setGravity(Gravity.CENTER);
-        tv.setBackground(round(Color.parseColor(bg), 9));
-        tv.setPadding(0, dp(10), 0, dp(10));
-        return tv;
-    }
-
-    private void hidePanel() {
-        if (panel != null) {
-            try { wm.removeView(panel); } catch (Exception ignored) { }
-            panel = null;
-            panelScroll = null;
-            panelBody = null;
-            panelMeta = null;
-            panelAction = null;
-            panelScore = null;
-            panelReason = null;
-        }
-    }
-
-    /* ---------------- 复制 / 填入 ---------------- */
+    /* ================= 复制 / 填入 ================= */
 
     private void copy(String text) {
         try {
@@ -724,5 +742,10 @@ public class ReaderService extends AccessibilityService {
 
     private void toast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    }
+
+    private String shortMsg(String s) {
+        if (s == null) return "";
+        return s.length() > 70 ? s.substring(0, 70) + "…" : s;
     }
 }
