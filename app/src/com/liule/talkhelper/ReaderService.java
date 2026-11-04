@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -206,12 +207,29 @@ public class ReaderService extends AccessibilityService {
     private void trigger() {
         if (busy) return;
         hidePanel();
+        final boolean appending = appendMode;
+        if (appending) toast("读取中…");
+        // 延迟再读：滚动后系统的无障碍节点树有更新延迟，立刻读会拿到滚动前的缓存快照
+        int delay = appending ? 500 : 150;
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override public void run() { doTrigger(appending); }
+        }, delay);
+    }
+
+    private void doTrigger(boolean appending) {
         String raw = readScreen();
         boolean thin = raw.replaceAll("\\s", "").length() < 15;
 
-        if (appendMode) {
+        if (appending) {
             if (thin) {
-                toast("这一屏没读到新内容，滚一下再点");
+                toast("这一屏没读到内容，等页面加载完再点一次");
+                setAppendMode(true);
+                return;
+            }
+            int fresh = countNewLines(raw, lastRaw);
+            if (fresh < 3) {
+                // 读回来的内容几乎都在上一屏里 → 页面没滚动到位或又读到了旧缓存
+                toast("这一屏和前面基本一样（新增 " + fresh + " 行）。多滚一段距离，停顿半秒再点球");
                 setAppendMode(true);
                 return;
             }
@@ -230,17 +248,38 @@ public class ReaderService extends AccessibilityService {
         showPanel();
     }
 
+    /** 规范化：去掉所有空白，用于模糊去重 */
+    private static String norm(String s) {
+        return s.replaceAll("\\s+", "");
+    }
+
+    /** 统计 newText 里有多少行是 oldText 没有的（模糊匹配） */
+    private int countNewLines(String newText, String oldText) {
+        Set<String> have = new HashSet<String>();
+        for (String l : oldText.split("\n")) {
+            String t = norm(l);
+            if (!t.isEmpty()) have.add(t);
+        }
+        int c = 0;
+        for (String l : newText.split("\n")) {
+            String t = norm(l);
+            if (t.length() < 2) continue;
+            if (!have.contains(t)) c++;
+        }
+        return c;
+    }
+
     /** 把新读到的一屏并进已有文本，重复行只保留一份 */
     private String merge(String oldText, String newText) {
-        Set<String> have = new LinkedHashSet<String>();
+        Set<String> have = new HashSet<String>();
         for (String l : oldText.split("\n")) {
-            String t = l.trim();
+            String t = norm(l);
             if (!t.isEmpty()) have.add(t);
         }
         StringBuilder sb = new StringBuilder(oldText);
         if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') sb.append('\n');
         for (String l : newText.split("\n")) {
-            String t = l.trim();
+            String t = norm(l);
             if (t.length() < 2) continue;
             if (have.contains(t)) continue;
             have.add(t);
@@ -359,7 +398,10 @@ public class ReaderService extends AccessibilityService {
         Set<String> out = new LinkedHashSet<String>();
 
         AccessibilityNodeInfo root = getRootInActiveWindow();
-        if (root != null) walk(root, out, 0);
+        if (root != null) {
+            try { root.refresh(); } catch (Exception ignored) { }   // 强制重新取节点，避免读到滚动前缓存
+            walk(root, out, 0);
+        }
 
         if (out.size() < 5) {
             List<AccessibilityWindowInfo> wins = getWindows();
