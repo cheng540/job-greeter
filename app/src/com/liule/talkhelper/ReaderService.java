@@ -205,7 +205,7 @@ public class ReaderService extends AccessibilityService {
     /* ================= 主流程：先攒后生成 ================= */
 
     private void trigger() {
-        if (busy) return;
+        if (busy) { toast("正在生成中，等几秒再点"); return; }
         hidePanel();
         final boolean appending = appendMode;
         if (appending) toast("读取中…");
@@ -290,7 +290,7 @@ public class ReaderService extends AccessibilityService {
     }
 
     private void startGenerate() {
-        if (busy) return;
+        if (busy) { toast("正在生成中，别急"); return; }
         final Cfg cfg = Cfg.load(this);
         busy = true;
         panelMode = MODE_RESULT;
@@ -306,6 +306,25 @@ public class ReaderService extends AccessibilityService {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    genBody(cfg, jd);
+                } catch (final Throwable t) {
+                    // 兜底：生成过程任何崩溃都不能把 busy 卡死，否则悬浮球从此永远没反应
+                    ui.post(new Runnable() {
+                        @Override public void run() {
+                            busy = false;
+                            toast("生成出错：" + shortMsg(String.valueOf(t)));
+                            panelAction.setEnabled(true);
+                            panelAction.setAlpha(1f);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void genBody(final Cfg cfg, final String jd) {
+        {
                 String url = "";
                 if (cfg.autoLink) {
                     try {
@@ -318,6 +337,7 @@ public class ReaderService extends AccessibilityService {
                 String reason = "";
                 int score = -1;
                 String err = null;
+                final boolean configured = cfg.ready();
                 if (configured) {
                     try {
                         Llm.Out lo = Llm.generate(cfg, jd, cfg.words);
@@ -388,8 +408,7 @@ public class ReaderService extends AccessibilityService {
                         if (!fConfigured) toast("还没配 API，去 App 里填好地址/模型/Key");
                     }
                 });
-            }
-        }).start();
+        }
     }
 
     /* ================= 读屏 ================= */
