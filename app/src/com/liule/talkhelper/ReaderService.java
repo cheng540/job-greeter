@@ -267,6 +267,14 @@ public class ReaderService extends AccessibilityService {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                String url = "";
+                if (cfg.autoLink) {
+                    try {
+                        url = grabLink();
+                    } catch (Exception ignored) {
+                    }
+                }
+
                 String out = null;
                 String reason = "";
                 int score = -1;
@@ -306,7 +314,7 @@ public class ReaderService extends AccessibilityService {
                 rec.score = usedLlm ? score : -1;
                 rec.reason = usedLlm ? reason : "";
                 rec.talk = out;
-                rec.url = "";
+                rec.url = url;
                 rec.sent = false;
 
                 Db db = new Db(ReaderService.this);
@@ -333,7 +341,11 @@ public class ReaderService extends AccessibilityService {
                                 : "内置模板 · " + text.length() + " 字") + sc;
                         shownScore = fUsed ? fScore : -1;
                         shownReason = fReason;
-                        showPanel();
+                        if (appendMode) {
+                            toast("已生成并复制（" + fScore + " 分），攒完屏点「开始生成」");
+                        } else {
+                            showPanel();
+                        }
                         if (!fConfigured) toast("还没配 API，去 App 里填好地址/模型/Key");
                     }
                 });
