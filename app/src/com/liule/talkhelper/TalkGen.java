@@ -256,9 +256,9 @@ final class TalkGen {
         String tools = findTools(cv);
         if (aiType && tools != null) {
             out.append("\n\n平时主要靠 ").append(tools)
-               .append(" 这类工具推进，我负责拆需求、定架构和验收，代码逐段验证后才用。");
+               .append(" 这类 AI 编程工具做开发（vibe coding），做出来的项目部署在自己云服务器上 7×24 运行，可以随时演示。");
         } else if (aiType) {
-            out.append("\n\n习惯是先定架构再动手，产出逐段验证，不靠「看起来能跑」下结论。");
+            out.append("\n\n做东西的习惯是从 GitHub 开源项目获取灵感、结合自己的创意实现，从开发到部署上线全程自己负责。");
         }
 
         /* 第五段：给动作 */

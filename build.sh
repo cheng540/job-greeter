@@ -24,7 +24,7 @@ echo "[2/7] 链接资源与清单"
   --java build/gen \
   --min-sdk-version 26 \
   --target-sdk-version 34 \
-  --version-code 23 --version-name 3.2 \
+  --version-code 24 --version-name 3.3 \
   --auto-add-overlay
 
 echo "[3/7] 编译 Java"
