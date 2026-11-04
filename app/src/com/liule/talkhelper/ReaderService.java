@@ -473,7 +473,7 @@ public class ReaderService extends AccessibilityService {
         if (collect) {
             TextView more = smallBtn("补充下一屏", "#FFF7ED", "#C2410C");
             more.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { setAppendMode(true); }
+                @Override public void onClick(View v) { setAppendMode(true); hidePanel(); }
             });
             row.addView(more, weightLp());
 
@@ -513,7 +513,7 @@ public class ReaderService extends AccessibilityService {
 
             TextView more = smallBtn("补充下一屏", "#FFF7ED", "#C2410C");
             more.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { setAppendMode(true); }
+                @Override public void onClick(View v) { setAppendMode(true); hidePanel(); }
             });
             LinearLayout.LayoutParams mlp = weightLp();
             mlp.leftMargin = dp(8);
